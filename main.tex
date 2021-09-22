@@ -1,0 +1,32 @@
+\documentclass{tufte-book}
+
+\usepackage{pgffor} % \foreach
+\usepackage{shortcuts}
+\usepackage{lipsum}
+
+\newcommand*{\MinYear}{2021}
+\newcommand*{\MaxYear}{2021}
+\newcommand\TwoDigits[1]{\ifnum#1<10 0#1\else#1\fi}
+
+\newcommand{\makedate}[3]{#3-#2-#1}
+\newenvironment{logentry}[3]% Year, Month, Day, Heading
+{\noindent\textbf{Entry}\marginnote{\makedate{#1}{#2}{#3}}\par}{\vspace{0.5cm}}
+
+\begin{document}
+
+\foreach \YYYY in {\MinYear,...,\MaxYear} {%
+    \foreach \MM in {1,2,...,12} {%
+        \foreach \DD in {1,2,...,31} {%
+            \edef\FileName{\YYYY\TwoDigits{\MM}\TwoDigits{\DD}.tex}
+            \IfFileExists{\FileName} {%
+                \begin{logentry}{\YYYY}{\MM}{\DD}
+                    \input{\FileName}%
+                \end{logentry}
+            } {%
+                % File does not exist, don't do anything
+            }%
+        }%
+    }%
+}%
+
+\end{document}
