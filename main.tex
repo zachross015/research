@@ -1,10 +1,27 @@
-\documentclass[justified]{tufte-book}
-
+\documentclass[nobib, justified]{tufte-book}
 
 \usepackage{pgffor} % \foreach
 \usepackage{shortcuts}
 \usepackage{lipsum}
 \usepackage{concmath}
+\usepackage[style=verbose, autocite=footnote, backend=biber]{biblatex}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{xspace}
+\usepackage{soul}
+\addbibresource{bib.bib}
+%\renewcommand{\autocite}{\cite}
+
+\let\en=\ensuremath
+
+\newtheorem{lemma}{Lemma}
+\newtheorem{research}{Research Question}
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 
 \newcommand*{\MinYear}{2021}
 \newcommand*{\MaxYear}{2021}
@@ -17,6 +34,16 @@
 
 \newcommand{\expect}[1]{\ensuremath{\mathbb{E}\left[#1\right]}}
 \newcommand{\expectdist}[2]{\ensuremath{\mathbb{E}_{#1}\left[#2\right]}}
+\newcommand{\maxdiv}[2]{\ensuremath{D_{\infty}(#1 || #2)}}
+\newcommand{\maxdivs}[2]{\ensuremath{D^{\delta}_{\infty}(#1 || #2)}}
+\newcommand{\samplespace}{\ensuremath{\mathbb{S}}}
+
+\renewcommand{\vec}[1]{\en{\bm{#1}}}
+\newcommand{\mat}[1]{\en{{\bm{\mathrm{#1}}}}}
+\newcommand{\grad}[0]{\en{\nabla}}
+
+\newcommand{\dd}[1]{\mathop{}\!\mathrm{d} #1}
+\newcommand{\pdv}[2]{\en{\frac{\partial #1}{\partial #2}}}
 
 \begin{document}
 
@@ -35,5 +62,7 @@
         }%
     }%
 }%
+
+\printbibliography
 
 \end{document}
