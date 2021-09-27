@@ -3,4 +3,5 @@
 !.gitignore
 !*.tex
 !*.lex
+!build/main.pdf
 
