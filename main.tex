@@ -25,13 +25,13 @@
 \DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 
 \newcommand*{\MinYear}{2021}
-\newcommand*{\MaxYear}{2021}
+\newcommand*{\MaxYear}{2022}
 \newcommand\TwoDigits[1]{\ifnum#1<10 0#1\else#1\fi}
 
-\newcounter{day}[part]
+\newcounter{entry}[part]
 \newcommand{\makedate}[3]{#3-#2-#1}
 \newenvironment{logentry}[3]% Year, Month, Day, Heading
-{\refstepcounter{day}\noindent\textbf{Day~\theday}\marginnote{\makedate{#1}{#2}{#3}}\par}{\vspace{0.5cm}}
+{\refstepcounter{entry}\noindent\textbf{Entry~\theentry}\marginnote{\makedate{#1}{#2}{#3}}\par}{\vspace{0.5cm}}
 
 \newcommand{\expect}[1]{\ensuremath{\mathbb{E}\left[#1\right]}}
 \newcommand{\expectdist}[2]{\ensuremath{\mathbb{E}_{#1}\left[#2\right]}}
@@ -54,6 +54,7 @@
             \edef\FileName{\YYYY\TwoDigits{\MM}\TwoDigits{\DD}.lex}
             \IfFileExists{\FileName} {%
                 \par
+                \noindent\rule{\linewidth}{0.2pt}
                 \begin{logentry}{\YYYY}{\MM}{\DD}
                     \input{\FileName}%
                 \end{logentry}

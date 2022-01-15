@@ -1,0 +1,183 @@
+\documentclass[nobib, justified]{tufte-book}
+
+\usepackage{pgffor} % \foreach
+\usepackage{shortcuts}
+\usepackage{lipsum}
+\usepackage{concmath}
+\usepackage[style=verbose, autocite=footnote, backend=biber]{biblatex}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{xspace}
+\usepackage{soul}
+\addbibresource{bib.bib}
+
+%\renewcommand{\autocite}{\cite}
+
+\let\en=\ensuremath
+\let\cal=\mathcal
+\newcommand{\thetaprune}{\theta_{\text{prune}}}
+
+
+\newcommand{\crm}{\rho_{\max}}
+\newcommand{\crcc}{\rho_{\text{cr}}}
+
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{axiom}{Axiom}
+\newtheorem{research}{Research Question}
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclarePairedDelimiter{\generator}{\left<}{\right>}
+
+% Real numbers
+\newcommand{\R}{\mathbb{R}}
+
+% Random Variables
+\newcommand{\E}[2]{\ensuremath{\mathbb{E}_{#1}\left[#2\right]}}
+\newcommand{\maxdiv}[2]{\ensuremath{D_{\infty}(#1 || #2)}}
+\newcommand{\maxdivs}[2]{\ensuremath{D^{\delta}_{\infty}(#1 || #2)}}
+\newcommand{\samplespace}{\ensuremath{\mathbb{S}}}
+
+% Linear Algebra
+\renewcommand{\vec}[1]{\en{\bm{#1}}}
+\newcommand{\mat}[1]{\en{{\bm{\mathrm{#1}}}}}
+\newcommand{\grad}[0]{\en{\nabla}}
+\newcommand{\transpose}[1]{\ensuremath{{\left({#1}\right)}^\intercal}}
+\newcommand{\dotproduct}[2]{\transpose{#1} #2}
+
+% Calculus
+\newcommand{\dd}[1]{\mathop{}\!\mathrm{d} #1}
+\newcommand{\pdv}[2]{\en{\frac{\partial #1}{\partial #2}}}
+\newcommand{\phieq}[1]{\en{\phi\left(#1\right)}}
+
+% Pruning paper
+\newcommand{\synapsemetric}[1]{\ensuremath{\dotproduct{\pdv{\cal{R}}{#1}}{#1}}}
+
+\title{Sparse Networks and Differential Privacy}
+\author{Zachary Ross}
+
+\begin{document}
+
+
+\maketitle
+
+
+\section{Pruning Neural Networks without any data by iteratively conserving
+synaptic flow}%
+\label{sec:pruning_neural_networks_without_any_data_by_iteratively_conserving_synaptic_flow}
+
+
+\subsection{Pruning Algorithms}%
+\label{sub:pruning_algorithms}
+
+Pruning algorithms are generally defined by 
+\begin{enumerate}
+    \item scoring parameters by some metric, and
+    \item masking parameters according to their scores.
+\end{enumerate} The latter is generally done by removing the parameters (e.g.
+making the value zero via Hadamard product). This can either be done via global
+masking or layer-masking, with global-masking performing better but suffering
+from \emph{layer-collapse}, which is when an entire layer is masked.
+
+Let $\theta$ be a collection of network parameters and $\thetaprune$ be the
+parameters remaining after pruning. The \emph{compression ratio} $\rho$ of a
+pruning algorithm is 
+\begin{equation}\label{eq:crat}
+    \rho = \frac{|\theta|}{|\thetaprune|}
+\end{equation}. We define $\crm$ as the maximal possible compression
+ratio for a \emph{network} that doesn't lead to layer collapse and the
+$\crcc$ as the maximal compression ratio a given \emph{algorithm} can achieve without
+inducing layer collapse. Note that the distinction in the two is $\crm$ is
+maximal for a network while $\crcc$ is maximal for an algorithm. These
+definitions motivate the following axiom:
+\begin{axiom}[Maximal Critical Compression]
+    For any pruning algorithm and any network, we should always have $\crcc =
+    \crm$. 
+\end{axiom}
+
+
+\subsection{Synaptic Saliency}%
+\label{sub:synaptic_saliency}
+
+\emph{Synaptic saliency} is a class of score metrics defined by 
+\begin{equation}
+    \label{eq:synaptic_saliency}
+    \cal{S}(\theta) = \pdv{\cal{R}}{\theta} \odot \theta
+\end{equation} where $\cal{R}$ is a scalar loss function of the output $y$
+of a feed-forward network parameterized by $\theta$. This metric satisfies two
+conservation laws:
+\begin{theorem}[Neuron-wise Conservation of Synaptic Saliency]
+    For a feedforward neural network with continuous, homogeneous activation
+    functions $\phi(x) = \phi'(x)x$, let $j$ be the index of a hidden neuron in
+    layer $i$. The sum of the synaptic saliency for the
+    incoming parameters to a hidden neuron $\left(\cal{S}^{(l)}_j =
+    \synapsemetric{\theta_{j}^{(l)}}\right)$ is equal to the sum of the
+    synaptic saliency for the outgoing parameters from the hidden neuron
+    $\left(\cal{S}^{(l + 1)} = \synapsemetric{\theta_{:,j}^{(l + 1)}}\right)$.
+\end{theorem}
+\begin{proof}
+    Let each neuron in layer $l$ be defined by $z_i^{(l)} =
+    \theta_i^{(l)}\phieq{z^{(l - 1)}} = \sum_{j=1}^n\theta_{i,j}^{(l)}\phieq{z_j^{(l-1)}}$
+    and note the following
+    \begin{equation}
+        \begin{aligned}
+            \label{eq:proof1}
+            \pdv{R}{\phieq{z_j^{(l - 1)}}} &= \sum_{i = 1}^m
+            \pdv{R}{z_i^{(l)}}\pdv{z_i^{(l)}}{\phieq{z_j^{(l - 1)}}}
+            \alcomment{total derivative} \\
+            &= \sum_{i = 1}^m \pdv{R}{z_i^{(l)}} \theta_{i,j}^{(l)}
+            \alcomment{substituion}
+        \end{aligned}
+    \end{equation}.
+
+    For the incoming parameters, we have that 
+    \begin{equation}
+        \begin{aligned}
+            \label{eq:}
+            \cal{S}^{(l)}_i &= \sum_{j = 1}^n \pdv{R}{\theta_{ij}^{(l)}}
+            \theta_{ij}^{(l)} \alcomment{definition} \\
+            &= \sum_{j = 1}^n \pdv{R}{z_i^{(l)}} 
+            \pdv{z_i^{(l)}}{\theta_{ij}^{(l)}}\theta_{ij}^{(l)} \alcomment{chain rule}\\
+            &= \sum_{j = 1}^n \pdv{R}{z_i^{(l)}} \phieq{z_j^{(l - 1)}}
+            \theta_{ij}^{(l)} \alcomment{substitution} \\ 
+            &=\pdv{R}{z_i^{(l)}} z_i^{(l)} \alcomment{vectorization}
+        \end{aligned}
+    \end{equation} and for the outgoing parameters we have that 
+    \begin{equation}
+        \begin{aligned}
+            \label{eq:}
+            \cal{S}^{(l + 1)}_j &= \sum_{i = 1}^n \pdv{R}{\theta_{ij}^{(l + 1)}}
+            \theta_{ij}^{(l + 1)} \alcomment{definition} \\
+            &= \sum_{i = 1}^m \pdv{R}{z_i^{(l + 1)}}
+            \pdv{z_i^{(l + 1)}}{\theta_{ij}^{(l + 1)}}\theta_{ij}^{(l + 1)}
+            \alcomment{chain rule} \\
+            &= \sum_{i = 1}^n \pdv{R}{z_i^{(l + 1)}} \phieq{z_j^{(l)}}
+            \theta_{ij}^{(l + 1)} \alcomment{substitution} \\ 
+            &=  \left(\sum_{i = 1}^n\pdv{R}{z_i^{(l + 1)}} \theta_{ij}^{(l + 1)}\right) \phieq{z_j^{(l)}}
+            \alcomment{rearrange variables} \\ 
+            &=\pdv{R}{\phieq{z_j^{(l)}}} \phieq{z_j^{(l)}}
+            \alcomment{substitute equation~\ref{eq:proof1}}
+        \end{aligned}
+    \end{equation}. 
+
+    This shows that $\cal{S}^{(l)}_j = \cal{S}^{(l + 1)}_j$ so long as $\phi$ is
+    homogeneous.
+\end{proof}
+\begin{theorem}[Network-wise Conservation of Synaptic Saliency]
+    The sum of the synaptic saliency across any set of parameters that exactly
+    separates the input neurons $x$ from the output neurons $y$ of a feedforward
+    neural network with homogeneous activation functions equals
+    $\synapsemetric{x} = \synapsemetric{y}$.
+\end{theorem}
+
+
+
+
+\printbibliography
+
+\end{document}

@@ -37,7 +37,7 @@ and the \emph{matrix product is}
 the idea. This seems much more intuitive than the typical vector operation
 scheme (imo).
 
-\begin{research}
+\begin{research}\label{rsh:clip}
     Differentially private training of a neural network $f_{\theta}$ requires
     bounding the sensitivity of the gradient defined by 
     \begin{equation} \label{eq:gradw_norm}
@@ -46,8 +46,8 @@ scheme (imo).
         \left(\vec{h}^{(\ell-1)}\right)^\intercal}_{\mathsf{F}}
     \end{equation}. The Gradient Clipping Technique~\autocite{deep} rescales the
     gradient as follows:
-    \begin{equation}
-        \bar{\vec{g}} = \min\{1, C /\norm{\vec{g}}_2\} \cdot \vec{g}
+    \begin{equation}\label{eq:clip}
+        \bar{\vec{g}} = \frac{\vec{g}}{\min\left\{1, \frac{C}{\norm{\vec{g}}_2}\right\}}
     \end{equation}, where $\vec{g}$ is the vectorized gradient and $C$ is a
     clipping threshold. Is there a way to analytically bound the norm of
     gradient in Equation~\ref{eq:gradw_norm} so that we don't have to modify the
