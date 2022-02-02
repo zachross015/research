@@ -1,62 +1,21 @@
-\documentclass[nobib, justified]{tufte-book}
+\documentclass{article}
+\usepackage{zross-style}
 
-\usepackage{pgffor} % \foreach
-\usepackage{shortcuts}
-\usepackage{lipsum}
-\usepackage{concmath}
-\usepackage[style=verbose, autocite=footnote, backend=biber]{biblatex}
-\usepackage{amsthm}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{mathtools}
-\usepackage{bm}
-\usepackage{xspace}
-\usepackage{soul}
+
 \addbibresource{bib.bib}
 
-%\renewcommand{\autocite}{\cite}
-
-\let\en=\ensuremath
-\let\cal=\mathcal
 \newcommand{\thetaprune}{\theta_{\text{prune}}}
+\renewcommand{\th}{\en{\text{th}}}
 
+% References 
+\newcommand{\sectioncite}[1]{\citefield{#1}{title}~\cite{#1}}
 
+% Commonly used variables
 \newcommand{\crm}{\rho_{\max}}
 \newcommand{\crcc}{\rho_{\text{cr}}}
 
-\newtheorem{lemma}{Lemma}
-\newtheorem{proposition}{Proposition}
-\newtheorem{theorem}{Theorem}
-\newtheorem{axiom}{Axiom}
-\newtheorem{research}{Research Question}
-
-\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
-\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
-\DeclarePairedDelimiter{\generator}{\left<}{\right>}
-
-% Real numbers
-\newcommand{\R}{\mathbb{R}}
-
-% Random Variables
-\newcommand{\E}[2]{\ensuremath{\mathbb{E}_{#1}\left[#2\right]}}
-\newcommand{\maxdiv}[2]{\ensuremath{D_{\infty}(#1 || #2)}}
-\newcommand{\maxdivs}[2]{\ensuremath{D^{\delta}_{\infty}(#1 || #2)}}
-\newcommand{\samplespace}{\ensuremath{\mathbb{S}}}
-
-% Linear Algebra
-\renewcommand{\vec}[1]{\en{\bm{#1}}}
-\newcommand{\mat}[1]{\en{{\bm{\mathrm{#1}}}}}
-\newcommand{\grad}[0]{\en{\nabla}}
-\newcommand{\transpose}[1]{\ensuremath{{\left({#1}\right)}^\intercal}}
-\newcommand{\dotproduct}[2]{\transpose{#1} #2}
-
-% Calculus
-\newcommand{\dd}[1]{\mathop{}\!\mathrm{d} #1}
-\newcommand{\pdv}[2]{\en{\frac{\partial #1}{\partial #2}}}
-\newcommand{\phieq}[1]{\en{\phi\left(#1\right)}}
-
 % Pruning paper
-\newcommand{\synapsemetric}[1]{\ensuremath{\dotproduct{\pdv{\cal{R}}{#1}}{#1}}}
+\newcommand{\synapsemetric}[1]{\en{\dotp{\pdv{\cal{R}}{#1}, #1}}}
 
 \title{Sparse Networks and Differential Privacy}
 \author{Zachary Ross}
@@ -66,11 +25,62 @@
 
 \maketitle
 
+\tableofcontents
+\pagebreak
 
-\section{Pruning Neural Networks without any data by iteratively conserving
-synaptic flow}%
+In the following research, we make use frequently of the set of parameters
+$\theta$. A couple things to note about how this is used: it is common practice
+to reference the set of parameter in a multitude of ways, none of which is
+extrapolated upon in any papers I've come across and has been entirely
+frustrating to decipher on its own. $\theta$ is often referred to a set of
+parameters rather than a collection, yet is often assigned an ordering of
+arbitrary dimensionality. I will attempt to disclose my understanding of this
+dimensionality and these short-hands briefly
+\begin{enumerate}
+    \item $\theta_i$ is access to some arbitrary element of $\theta$,
+    \item $\theta_i^{(l)}$ is the $i^\th$ row in the matrix of parameters at layer $l$, 
+    \item and $\theta^{(l)}_{i, j}$ is the element in the $i^\th$ row and $j^\th$
+        column of the matrix of parameters at layer $l$. This is periodically
+        shorthanded to $\theta_{i, j}$ when authors assume an arbitrary
+        layer.
+\end{enumerate} Unless otherwise mentioned, these will be used throughout.
+
+\section{Dated Findings}
+
+\subsectiondate{2022-02-02}%
+
+In the work presented to me, Dr. Lee primarily uses pruning for gradient masking
+rather than parameter masking, although most studies I've read seem to have done
+the opposite. I initially assumed that given the standard linear layer function
+with masking 
+\begin{equation}
+    \label{eq:linearmask}
+    \vec{z} = (\mat{M} \odot\mat{W})\vec{h} + \vec{b}
+\end{equation} the effect of the mask would still result in non-zero values in
+the gradient of the matrix. This is falsified by the derivation
+\begin{equation}
+        \pdv{L}{W_{i,j}} = \pdv{L}{z_i}\pdv{z_i}{W_{ij}} = M_{ij} \pdv{L}{z_i}
+        h_j
+\end{equation} or in vectorized form we have that 
+\begin{equation}
+    \label{eq:backgrad}
+    \pdv{L}{\mat{W}} = \mat{M} \odot \left(\pdv{L}{\vec{z}}\tpose{\vec{h}}\right)
+\end{equation} which implies that the use of a forward mask guarantees that of a
+backward. The method used instead in Dr. Lee's examples was $\vec{z} =
+\mat{W}\vec{h} + \vec{b}$ with masking only applied during the gradient (i.e.\
+that of \refeq{backgrad}). So what needs to be tested is whether or not we can
+apply masking solely during the forward phase i.e.\ implement \refeq{linearmask}
+with builds its gradient without the mask.
+
+\section{\sectioncite{prune}}%
 \label{sec:pruning_neural_networks_without_any_data_by_iteratively_conserving_synaptic_flow}
 
+This paper, while theoretically captivating, is lackluster with providing
+mathematical commentary on the concepts and proofs. It may be worthwhile to go
+back and either notate the more mathematical definitions of the paper, or derive
+my own definitions and reprove their claims using a more solid theoretical
+foundation. This may even set a better groundwork for future 
+analysis.
 
 \subsection{Pruning Algorithms}%
 \label{sub:pruning_algorithms}
@@ -115,59 +125,10 @@ conservation laws:
     For a feedforward neural network with continuous, homogeneous activation
     functions $\phi(x) = \phi'(x)x$, let $j$ be the index of a hidden neuron in
     layer $i$. The sum of the synaptic saliency for the
-    incoming parameters to a hidden neuron $\left(\cal{S}^{(l)}_j =
-    \synapsemetric{\theta_{j}^{(l)}}\right)$ is equal to the sum of the
+    incoming parameters to a hidden neuron $\left(\cal{S}^{(l)_{\text{in}}}_j = \synapsemetric{\theta_j^{(l)}} \right)$ is equal to the sum of the
     synaptic saliency for the outgoing parameters from the hidden neuron
-    $\left(\cal{S}^{(l + 1)} = \synapsemetric{\theta_{:,j}^{(l + 1)}}\right)$.
+    $\left(\cal{S}^{(l)_{\text{out}}}_j = \synapsemetric{\theta_{:,j}^{(l + 1)}}\right)$.
 \end{theorem}
-\begin{proof}
-    Let each neuron in layer $l$ be defined by $z_i^{(l)} =
-    \theta_i^{(l)}\phieq{z^{(l - 1)}} = \sum_{j=1}^n\theta_{i,j}^{(l)}\phieq{z_j^{(l-1)}}$
-    and note the following
-    \begin{equation}
-        \begin{aligned}
-            \label{eq:proof1}
-            \pdv{R}{\phieq{z_j^{(l - 1)}}} &= \sum_{i = 1}^m
-            \pdv{R}{z_i^{(l)}}\pdv{z_i^{(l)}}{\phieq{z_j^{(l - 1)}}}
-            \alcomment{total derivative} \\
-            &= \sum_{i = 1}^m \pdv{R}{z_i^{(l)}} \theta_{i,j}^{(l)}
-            \alcomment{substituion}
-        \end{aligned}
-    \end{equation}.
-
-    For the incoming parameters, we have that 
-    \begin{equation}
-        \begin{aligned}
-            \label{eq:}
-            \cal{S}^{(l)}_i &= \sum_{j = 1}^n \pdv{R}{\theta_{ij}^{(l)}}
-            \theta_{ij}^{(l)} \alcomment{definition} \\
-            &= \sum_{j = 1}^n \pdv{R}{z_i^{(l)}} 
-            \pdv{z_i^{(l)}}{\theta_{ij}^{(l)}}\theta_{ij}^{(l)} \alcomment{chain rule}\\
-            &= \sum_{j = 1}^n \pdv{R}{z_i^{(l)}} \phieq{z_j^{(l - 1)}}
-            \theta_{ij}^{(l)} \alcomment{substitution} \\ 
-            &=\pdv{R}{z_i^{(l)}} z_i^{(l)} \alcomment{vectorization}
-        \end{aligned}
-    \end{equation} and for the outgoing parameters we have that 
-    \begin{equation}
-        \begin{aligned}
-            \label{eq:}
-            \cal{S}^{(l + 1)}_j &= \sum_{i = 1}^n \pdv{R}{\theta_{ij}^{(l + 1)}}
-            \theta_{ij}^{(l + 1)} \alcomment{definition} \\
-            &= \sum_{i = 1}^m \pdv{R}{z_i^{(l + 1)}}
-            \pdv{z_i^{(l + 1)}}{\theta_{ij}^{(l + 1)}}\theta_{ij}^{(l + 1)}
-            \alcomment{chain rule} \\
-            &= \sum_{i = 1}^n \pdv{R}{z_i^{(l + 1)}} \phieq{z_j^{(l)}}
-            \theta_{ij}^{(l + 1)} \alcomment{substitution} \\ 
-            &=  \left(\sum_{i = 1}^n\pdv{R}{z_i^{(l + 1)}} \theta_{ij}^{(l + 1)}\right) \phieq{z_j^{(l)}}
-            \alcomment{rearrange variables} \\ 
-            &=\pdv{R}{\phieq{z_j^{(l)}}} \phieq{z_j^{(l)}}
-            \alcomment{substitute equation~\ref{eq:proof1}}
-        \end{aligned}
-    \end{equation}. 
-
-    This shows that $\cal{S}^{(l)}_j = \cal{S}^{(l + 1)}_j$ so long as $\phi$ is
-    homogeneous.
-\end{proof}
 \begin{theorem}[Network-wise Conservation of Synaptic Saliency]
     The sum of the synaptic saliency across any set of parameters that exactly
     separates the input neurons $x$ from the output neurons $y$ of a feedforward
@@ -175,7 +136,78 @@ conservation laws:
     $\synapsemetric{x} = \synapsemetric{y}$.
 \end{theorem}
 
+\subsection{Algorithm}%
+\label{sub:algorithm}
 
+
+For the following theorem, we define the \emph{prune size} to be the total score
+for the parameters pruned at any iteration and the \emph{cut size} to be the
+total score for an entire layer.
+\begin{theorem}
+    If a pruning algorithm with global-masking assigns positive scores that
+    respect layer-wise conservation, and if the prune size is strictly less than 
+    the cut size whenever possible, then the algorithm satisfies the Maximal
+    Critical Compression axiom. 
+\end{theorem}
+
+The pruning algorithm defined in this paper uses a loss function 
+\begin{equation}
+    \label{eq:lossr}
+    \cal{R}_{\text{SF}} = \1^\intercal \left(\prod_{l = 1}^L
+    \abs{\theta^{(l)}}\right) \1
+\end{equation} so that for a fully connected network $\left(f_\theta(x) =
+\theta^{(L)}\dots \theta^{(1)}\vec{x}\right)$ the Synaptic Flow score for a
+parameter $\theta_{i, j}^{(l)}$ is 
+\begin{equation}
+    \cal{S}_{\text{SF}}(\theta_{i, j}^{(l)}) = \left[\1^\intercal
+    \prod_{k = l + 1}^L \abs{\theta^{(k)}}\right]_i \abs{\theta_{i, j}^{(l)}}
+    \left[\prod_{k = 1}^{l - 1} \abs{\theta^{(k)}}\1 \right]_j
+\end{equation} i.e. the portion of the $l_1$-path norm the network has through
+this parameter. This contributes to the development of \refalg{synflow}.
+
+
+\begin{algorithm}[h]
+    \caption{Iterative Synaptic Flow Pruning (SynFlow)}
+    \label{alg:synflow}
+    \begin{algorithmic}
+        \Require network $f_\theta$, compression ratio $\rho$, iteration steps $n$
+        \State $\mu = \1$ \Comment{Initialize binary mask}
+        \For{$k$ in $[1,\dots, n]$}
+            \State $\theta_\mu \leftarrow \mu \odot \theta_0$ \Comment{Mask parameters}
+            \State $\cal{R} \leftarrow \1^\intercal \left(\prod_{l = 1}^L \abs{\theta^{(l)}_\mu}\right) \1$ \Comment{Evaluate SynFlow objective}
+            \State $\cal{S} = \pdv{\cal{R}}{\theta_\mu} \odot \theta_\mu$ \Comment{Compute SynFlow score}
+            \State $\tau \leftarrow \left(1 - \rho^{-k/n}\right)$ percentile of $\cal{S}$ \Comment{Find threshold}
+            \State $\mu \leftarrow (\tau < \cal{S})$ \Comment{Update mask}
+        \EndFor
+        \State \Return $f_{\mu \odot \theta}$ \Comment{Return masked network}
+    \end{algorithmic}
+\end{algorithm}
+
+\subsection{Commentary}%
+\label{sub:commentary}
+
+A thought I had: the loss function defined in \refeq{lossr} seems to almost
+indicate a just-past-the-minimum metric for the predefined network. It
+effectively is just the sum of the entries in the product of the network space.
+Although I agree with the data agnostic approach, I feel there should be a more
+suitable loss function which should seek to preserve this score rather than
+minimize it, or at the very least, should compare this score against some
+optimum, i.e.\ the optimum score for that network under those parameters. I also
+feel that the prune size and cut size should have a greater impact over the
+outcome of the resulting network, such that the compression ratio is fairly
+equal for all layers.
+
+\begin{research}
+    Does SynFlow, or other pruning methods for that matter, produce the same
+    network given different initial parameterizations? Furthermore, might we be
+    able to use a genetic algorithm to find the ``lottery ticket''?
+\end{research}
+One thing that needs to be considered with this question is that it's entirely
+possible that isomorphic networks could be produced, so there may need to be
+some kind of check that occurs post pruning that confirms whether or not this
+network has been discovered already.
+
+\section{\sectioncite{lth}}
 
 
 \printbibliography

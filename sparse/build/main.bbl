@@ -16,5 +16,96 @@
   {}
 \endgroup
 
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global}
+    \entry{lth}{article}{}
+      \name{author}{2}{}{%
+        {{hash=8f891d6f89678d7c987fed1e7090426b}{%
+           family={Frankle},
+           familyi={F\bibinitperiod},
+           given={Jonathan},
+           giveni={J\bibinitperiod}}}%
+        {{hash=7cc7d0487fdba682edd06e917656b031}{%
+           family={Carbin},
+           familyi={C\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{3258326f745480cc40d5d784a5209d9b}
+      \strng{fullhash}{3258326f745480cc40d5d784a5209d9b}
+      \strng{bibnamehash}{3258326f745480cc40d5d784a5209d9b}
+      \strng{authorbibnamehash}{3258326f745480cc40d5d784a5209d9b}
+      \strng{authornamehash}{3258326f745480cc40d5d784a5209d9b}
+      \strng{authorfullhash}{3258326f745480cc40d5d784a5209d9b}
+      \field{sortinit}{F}
+      \field{sortinithash}{fb0c0faa89eb6abae8213bf60e6799ea}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprinttype}{arXiv}
+      \field{journaltitle}{CoRR}
+      \field{title}{The Lottery Ticket Hypothesis: Training Pruned Neural Networks}
+      \field{volume}{abs/1803.03635}
+      \field{year}{2018}
+      \verb{eprint}
+      \verb 1803.03635
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/1803.03635
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/1803.03635
+      \endverb
+    \endentry
+    \entry{prune}{article}{}
+      \name{author}{4}{}{%
+        {{hash=006b59e43c2f4245319074258dfc4c82}{%
+           family={Tanaka},
+           familyi={T\bibinitperiod},
+           given={Hidenori},
+           giveni={H\bibinitperiod}}}%
+        {{hash=db9a81fc862fb57450e0557b4de33054}{%
+           family={Kunin},
+           familyi={K\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod}}}%
+        {{hash=e50dd60097af90f93f15311f85dab4bc}{%
+           family={Yamins},
+           familyi={Y\bibinitperiod},
+           given={Daniel\bibnamedelimb L.\bibnamedelimi K.},
+           giveni={D\bibinitperiod\bibinitdelim L\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=05b3e391388084df874ede60f2210c12}{%
+           family={Ganguli},
+           familyi={G\bibinitperiod},
+           given={Surya},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{028ff39bdec99d710e25f228f0c2f4ca}
+      \strng{fullhash}{b6d7fa83f39ea17d0f1772245ce6be47}
+      \strng{bibnamehash}{028ff39bdec99d710e25f228f0c2f4ca}
+      \strng{authorbibnamehash}{028ff39bdec99d710e25f228f0c2f4ca}
+      \strng{authornamehash}{028ff39bdec99d710e25f228f0c2f4ca}
+      \strng{authorfullhash}{b6d7fa83f39ea17d0f1772245ce6be47}
+      \field{sortinit}{T}
+      \field{sortinithash}{51f9faf24c60c62ca764a77f78cf5666}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprinttype}{arXiv}
+      \field{journaltitle}{CoRR}
+      \field{title}{Pruning neural networks without any data by iteratively conserving synaptic flow}
+      \field{volume}{abs/2006.05467}
+      \field{year}{2020}
+      \verb{eprint}
+      \verb 2006.05467
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2006.05467
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2006.05467
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
 \endinput
 
