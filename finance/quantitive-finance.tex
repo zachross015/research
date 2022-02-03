@@ -1,0 +1,54 @@
+\section{An Introduction to Quantitative Finance}
+
+\subsection{Interest Rates}
+
+\begin{definition}
+    A \emph{notional} or \emph{principal} is an initial deposit or value $N$.
+\end{definition}
+
+\begin{definition}
+    \label{def:irate}
+    An \emph{interest rate} $r$ is the rate at which a value is increased according to
+    a specified frequency of time. 
+\end{definition}
+
+Suppose we have an account with interest rate $r$ and notional $N$. The value of 
+the account at time $T$ is 
+\begin{equation}
+    N_T = Ne^{rT}
+\end{equation}
+Throughout finance, there exist discrete and continuous analogs for most
+equations due the discrete case being more realistic while the  continuous case
+is far more mathematically efficient. That being said, discrete analogs will be
+used sparsely and we will primarily depend on continuous equations. The discrete
+versions can be derived from the continuous versions by noting that
+\begin{equation}
+    e^{rT} = {\left(1 + \frac{r_m}{m}\right)}^{mT}
+\end{equation} where $T$ is commonly denoted as the time in years, $m$ is the
+frequency the interest is compounded, and $r_m$ is the equivalent interest rate
+with the discrete frequency. $r_m$ can then be recovered from $r$ using
+\begin{equation}
+    r_m = m\left(e^{\left(\frac{r}{m}\right)} - 1\right).
+\end{equation}
+
+\begin{definition}
+    A \emph{money market account} is an account compounded continuously at rate
+    $r$ with notional 1. I.e. $M_0 = 1$ and $M_{t} = e^{rt}$.
+\end{definition}
+
+\begin{definition}
+    A \emph{zero coupon bond} (ZCB) with maturity $T$ is an asset that pays 1 at
+    time $T$ (and nothing else). The value of a ZCB at time $t$ for a
+    continuously compounded rate $r$ is denoted as 
+    \begin{equation}
+        \label{eq:zcb}
+        Z(t, T) = e^{-r(T-t)}
+    \end{equation} where $Z(T, T) = 1$ by definition.     
+    The values $Z(t, T)$ with $0 \leq t \leq T$ are known as \emph{discount
+    factors} or \emph{present values}.
+\end{definition}
+
+The intuition behind the present values for a ZCB derives from the fact that if
+we have two portfolios, one a ZCB with maturity $T$ and another that contains
+cash which will accumulate interest to be worth 1 at time $T$, then both will be
+worth the same price at each $t$ leading up to $T$ and thereafter.
