@@ -1,78 +1,4 @@
-\documentclass{article}
-\usepackage{zross-style}
-
-
-\addbibresource{bib.bib}
-
-\newcommand{\thetaprune}{\theta_{\text{prune}}}
-\renewcommand{\th}{\en{\text{th}}}
-
-% References 
-\newcommand{\sectioncite}[1]{\citefield{#1}{title}~\cite{#1}}
-
-% Commonly used variables
-\newcommand{\crm}{\rho_{\max}}
-\newcommand{\crcc}{\rho_{\text{cr}}}
-
-% Pruning paper
-\newcommand{\synapsemetric}[1]{\en{\dotp{\pdv{\cal{R}}{#1}, #1}}}
-
-\title{Sparse Networks and Differential Privacy}
-\author{Zachary Ross}
-
-\begin{document}
-
-
-\maketitle
-
-\tableofcontents
-\pagebreak
-
-In the following research, we make use frequently of the set of parameters
-$\theta$. A couple things to note about how this is used: it is common practice
-to reference the set of parameter in a multitude of ways, none of which is
-extrapolated upon in any papers I've come across and has been entirely
-frustrating to decipher on its own. $\theta$ is often referred to a set of
-parameters rather than a collection, yet is often assigned an ordering of
-arbitrary dimensionality. I will attempt to disclose my understanding of this
-dimensionality and these short-hands briefly
-\begin{enumerate}
-    \item $\theta_i$ is access to some arbitrary element of $\theta$,
-    \item $\theta_i^{(l)}$ is the $i^\th$ row in the matrix of parameters at layer $l$, 
-    \item and $\theta^{(l)}_{i, j}$ is the element in the $i^\th$ row and $j^\th$
-        column of the matrix of parameters at layer $l$. This is periodically
-        shorthanded to $\theta_{i, j}$ when authors assume an arbitrary
-        layer.
-\end{enumerate} Unless otherwise mentioned, these will be used throughout.
-
-\section{Dated Findings}
-
-\subsectiondate{2022-02-02}%
-
-In the work presented to me, Dr. Lee primarily uses pruning for gradient masking
-rather than parameter masking, although most studies I've read seem to have done
-the opposite. I initially assumed that given the standard linear layer function
-with masking 
-\begin{equation}
-    \label{eq:linearmask}
-    \vec{z} = (\mat{M} \odot\mat{W})\vec{h} + \vec{b}
-\end{equation} the effect of the mask would still result in non-zero values in
-the gradient of the matrix. This is falsified by the derivation
-\begin{equation}
-        \pdv{L}{W_{i,j}} = \pdv{L}{z_i}\pdv{z_i}{W_{ij}} = M_{ij} \pdv{L}{z_i}
-        h_j
-\end{equation} or in vectorized form we have that 
-\begin{equation}
-    \label{eq:backgrad}
-    \pdv{L}{\mat{W}} = \mat{M} \odot \left(\pdv{L}{\vec{z}}\tpose{\vec{h}}\right)
-\end{equation} which implies that the use of a forward mask guarantees that of a
-backward. The method used instead in Dr. Lee's examples was $\vec{z} =
-\mat{W}\vec{h} + \vec{b}$ with masking only applied during the gradient (i.e.\
-that of \refeq{backgrad}). So what needs to be tested is whether or not we can
-apply masking solely during the forward phase i.e.\ implement \refeq{linearmask}
-with builds its gradient without the mask.
-
-\section{\sectioncite{prune}}%
+\subsection{\sectioncite{prune}}%
 \label{sec:pruning_neural_networks_without_any_data_by_iteratively_conserving_synaptic_flow}
 
 This paper, while theoretically captivating, is lackluster with providing
@@ -82,7 +8,7 @@ my own definitions and reprove their claims using a more solid theoretical
 foundation. This may even set a better groundwork for future 
 analysis.
 
-\subsection{Pruning Algorithms}%
+\subsubsection{Pruning Algorithms}%
 \label{sub:pruning_algorithms}
 
 Pruning algorithms are generally defined by 
@@ -111,7 +37,7 @@ definitions motivate the following axiom:
 \end{axiom}
 
 
-\subsection{Synaptic Saliency}%
+\subsubsection{Synaptic Saliency}%
 \label{sub:synaptic_saliency}
 
 \emph{Synaptic saliency} is a class of score metrics defined by 
@@ -136,7 +62,7 @@ conservation laws:
     $\synapsemetric{x} = \synapsemetric{y}$.
 \end{theorem}
 
-\subsection{Algorithm}%
+\subsubsection{Algorithm}%
 \label{sub:algorithm}
 
 
@@ -183,7 +109,7 @@ this parameter. This contributes to the development of \refalg{synflow}.
     \end{algorithmic}
 \end{algorithm}
 
-\subsection{Commentary}%
+\subsubsection{Commentary}%
 \label{sub:commentary}
 
 A thought I had: the loss function defined in \refeq{lossr} seems to almost
@@ -206,10 +132,3 @@ One thing that needs to be considered with this question is that it's entirely
 possible that isomorphic networks could be produced, so there may need to be
 some kind of check that occurs post pruning that confirms whether or not this
 network has been discovered already.
-
-\section{\sectioncite{lth}}
-
-
-\printbibliography
-
-\end{document}

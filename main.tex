@@ -1,69 +1,86 @@
-\documentclass[nobib, justified]{tufte-book}
+\documentclass{article}
 
-\usepackage{pgffor} % \foreach
-\usepackage{shortcuts}
-\usepackage{lipsum}
-\usepackage{concmath}
-\usepackage[style=verbose, autocite=footnote, backend=biber]{biblatex}
-\usepackage{amsthm}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{mathtools}
-\usepackage{bm}
-\usepackage{xspace}
-\usepackage{soul}
+\usepackage{zross-style}
+\usepackage[margin=1in]{geometry}
+\usepackage{import}
+
+
 \addbibresource{bib.bib}
-%\renewcommand{\autocite}{\cite}
 
-\let\en=\ensuremath
+% References 
+\newcommand{\sectioncite}[1]{\citefield{#1}{title}~\cite{#1}}
 
-\newtheorem{lemma}{Lemma}
-\newtheorem{proposition}{Proposition}
-\newtheorem{research}{Research Question}
+% Commonly used variables
+\newcommand{\crm}{\rho_{\max}}
+\newcommand{\crcc}{\rho_{\text{cr}}}
+\newcommand{\thetaprune}{\theta_{\text{prune}}}
+\renewcommand{\th}{\en{\text{th}}}
 
-\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
-\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+% Pruning paper
+\newcommand{\synapsemetric}[1]{\en{\dotp{\pdv{\cal{R}}{#1}, #1}}}
 
-\newcommand*{\MinYear}{2021}
-\newcommand*{\MaxYear}{2022}
-\newcommand\TwoDigits[1]{\ifnum#1<10 0#1\else#1\fi}
-
-\newcounter{entry}[part]
-\newcommand{\makedate}[3]{#3-#2-#1}
-\newenvironment{logentry}[3]% Year, Month, Day, Heading
-{\refstepcounter{entry}\noindent\textbf{Entry~\theentry}\marginnote{\makedate{#1}{#2}{#3}}\par}{\vspace{0.5cm}}
-
-\newcommand{\expect}[1]{\ensuremath{\mathbb{E}\left[#1\right]}}
-\newcommand{\expectdist}[2]{\ensuremath{\mathbb{E}_{#1}\left[#2\right]}}
-\newcommand{\maxdiv}[2]{\ensuremath{D_{\infty}(#1 || #2)}}
-\newcommand{\maxdivs}[2]{\ensuremath{D^{\delta}_{\infty}(#1 || #2)}}
-\newcommand{\samplespace}{\ensuremath{\mathbb{S}}}
-
-\renewcommand{\vec}[1]{\en{\bm{#1}}}
-\newcommand{\mat}[1]{\en{{\bm{\mathrm{#1}}}}}
-\newcommand{\grad}[0]{\en{\nabla}}
-
-\newcommand{\dd}[1]{\mathop{}\!\mathrm{d} #1}
-\newcommand{\pdv}[2]{\en{\frac{\partial #1}{\partial #2}}}
+\title{General Research Notes}
+\author{Zachary Ross}
 
 \begin{document}
 
-\foreach \YYYY in {\MinYear,...,\MaxYear} {%
-    \foreach \MM in {1,2,...,12} {%
-        \foreach \DD in {1,2,...,31} {%
-            \edef\FileName{\YYYY\TwoDigits{\MM}\TwoDigits{\DD}.lex}
-            \IfFileExists{\FileName} {%
-                \par
-                \noindent\rule{\linewidth}{0.2pt}
-                \begin{logentry}{\YYYY}{\MM}{\DD}
-                    \input{\FileName}%
-                \end{logentry}
-            } {%
-                % File does not exist, don't do anything
-            }%
-        }%
-    }%
-}%
+
+\maketitle
+
+\tableofcontents
+\pagebreak
+
+In the following research, we make use frequently of the set of parameters
+$\theta$. A couple things to note about how this is used: it is common practice
+to reference the set of parameter in a multitude of ways, none of which is
+extrapolated upon in any papers I've come across and has been entirely
+frustrating to decipher on its own. $\theta$ is often referred to a set of
+parameters rather than a collection, yet is often assigned an ordering of
+arbitrary dimensionality. I will attempt to disclose my understanding of this
+dimensionality and these short-hands briefly
+\begin{enumerate}
+    \item $\theta_i$ is access to some arbitrary element of $\theta$,
+    \item $\theta_i^{(l)}$ is the $i^\th$ row in the matrix of parameters at layer $l$, 
+    \item and $\theta^{(l)}_{i, j}$ is the element in the $i^\th$ row and $j^\th$
+        column of the matrix of parameters at layer $l$. This is periodically
+        shorthanded to $\theta_{i, j}$ when authors assume an arbitrary
+        layer.
+\end{enumerate} Unless otherwise mentioned, these will be used throughout.
+
+\section{Dated Findings}
+
+\subsectiondate{2022-02-02}%
+
+In the work presented to me, Dr. Lee primarily uses pruning for gradient masking
+rather than parameter masking, although most studies I've read seem to have done
+the opposite. I initially assumed that given the standard linear layer function
+with masking 
+\begin{equation}
+    \label{eq:linearmask}
+    \vec{z} = (\mat{M} \odot\mat{W})\vec{h} + \vec{b}
+\end{equation} the effect of the mask would still result in non-zero values in
+the gradient of the matrix. This is falsified by the derivation
+\begin{equation}
+        \pdv{L}{W_{i,j}} = \pdv{L}{z_i}\pdv{z_i}{W_{ij}} = M_{ij} \pdv{L}{z_i}
+        h_j
+\end{equation} or in vectorized form we have that 
+\begin{equation}
+    \label{eq:backgrad}
+    \pdv{L}{\mat{W}} = \mat{M} \odot \left(\pdv{L}{\vec{z}}\tpose{\vec{h}}\right)
+\end{equation} which implies that the use of a forward mask guarantees that of a
+backward. The method used instead in Dr. Lee's examples was $\vec{z} =
+\mat{W}\vec{h} + \vec{b}$ with masking only applied during the gradient (i.e.\
+that of \refeq{backgrad}). So what needs to be tested is whether or not we can
+apply masking solely during the forward phase i.e.\ implement \refeq{linearmask}
+with builds its gradient without the mask.
+
+\subsectiondate{2022-02-09}
+
+Thorough testing has disproved our previous hypothesis. Strangely enough, the
+gradient masking is much more effective than weight masking for some odd reason.
+
+\import{pruning/}{header}
+\import{finance/}{header}
 
 \printbibliography
 
