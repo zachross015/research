@@ -1,0 +1,38 @@
+import argparse
+import os
+
+parser = argparse.ArgumentParser(description='Creating new research files dynamically with little effort.')
+parser.add_argument('--category', default='no-category', type=str, help='Specify the category for which this research belongs')
+parser.add_argument('--name', required=True, type=str, help='Name the file and section reference')
+
+
+args = parser.parse_args()
+
+# Create the directory if it doesnt exist
+if not os.path.exists(args.category):
+
+    # Create the directory
+    os.makedirs(args.category)
+
+    # Create the header file in the directory
+    # TODO: Make the header file automatically read from all the other files in
+    # the folder rather than inputting them manually via this command line tool
+    with open(f'{args.category}/header.tex', 'w+') as f:
+        f.write(f'\\section{{{args.category}}}\n')
+
+    # Attach the header file to the overarching directory folder
+    with open('directories.tex', 'a') as f:
+        f.write(f'\\import{{{args.category}/}}{{header}}\n')
+
+    print(f'New directory created at {args.category}')
+
+
+with open(f'{args.category}/{args.name}.tex', 'w+') as f:
+    f.write(f'% \\subsection{{\\sectioncite{{{args.name}}}}}\n')
+    f.write(f'% \\label{{sec:{args.name}}}\n')
+
+with open(f'{args.category}/header.tex', 'a') as f:
+    f.write(f'\\import{{}}{{{args.name}}}\n')
+    
+print(f'New directory created at {args.category}/{args.name}.tex')
+print("Completed successfully!")
