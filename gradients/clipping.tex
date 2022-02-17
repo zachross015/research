@@ -1,0 +1,41 @@
+\subsection{\sectioncite{clipping}}
+\label{sec:clipping}
+
+This paper considers the class of problems dealing with the minimization of 
+\begin{equation}
+    \min_{x \in \R^n} f(x) \qquad \text{where} \qquad f(x) = \frac{1}{m} \sum_{i
+    = 1}^m f_i(x),
+\end{equation} where $f_i : \R^n \rightarrow \R$ are differentiable, non-convex
+functions. As a side note, this differs from notation that I'm used to, in
+that $x$ is considered to be the set of parameters while $i$, or more
+importantly $f_i$, is a function of the parameters using the $i^{\text{th}}$
+component of the dataset to measure the loss. That is, the function $f_i(x)$
+determines the loss accumulated when using $x$ as the set of parameters on input
+$i$. $f$ is said to be the \emph{objective function} while each $f_i$ is called
+a \emph{component function}.
+
+The incremental method for SGD is 
+\begin{equation}
+    x_{k+1} = x_{k}  - \alpha_k \grad f_{i_k}(x_k) \quad k= 0, 1, \dots
+\end{equation} where $x_k$ is the values of the parameters at ieration $k$,
+$\alpha_k$ is the learning rate, and $f_{i_k}$ is a uniform randomly chosen
+component function $i_k \in \{1, 2, \dots, m\}$ of the dataset. The incremental
+method for IGC is 
+\begin{equation}
+    x_{k, i} = x_{k, i -1} - \alpha_k \grad f_i(x_{k, i - 1}) \quad i = 1,
+    \dots, m \quad k = 0, 1, \dots
+\end{equation} where the recursion is defined by base case $x_{0, 0}$ and
+iterative step $x_{k, 0} = x_{k - 1, m}$ and is more cyclical by nature. 
+
+Our clipping function $\cal{C} : \R^n \rightarrow \R^n$ with clipping threshold
+parameter $\eta > 0$ is defined by 
+\begin{equation}
+    \cal{C}(g;\eta) = \min\left\{1, \frac{\eta}{\norm{g}}\right\} \cdot g
+\end{equation}. Our iterative methods can take advantage of clipping by clipping
+the gradient so that SGD with clipping is 
+\begin{equation}
+    x_{k+1} = x_{k}  - \alpha_k \cal{C}(\grad f_{i_k}(x_k); \eta),
+\end{equation} and IGC with clipping is 
+\begin{equation}
+    x_{k, i} = x_{k, i -1} - \alpha_k \cal{C}(\grad f_i(x_{k, i - 1}); \eta).
+\end{equation}
