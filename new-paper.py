@@ -2,8 +2,8 @@ import argparse
 import os
 
 parser = argparse.ArgumentParser(description='Creating new research files dynamically with little effort.')
-parser.add_argument('--category', default='no-category', type=str, help='Specify the category for which this research belongs')
-parser.add_argument('--name', required=True, type=str, help='Name the file and section reference')
+parser.add_argument('-c', '--category', required=True, type=str, help='Specify the category for which this research belongs')
+parser.add_argument('-n', '--name', required=True, type=str, help='Name the file and section reference')
 
 
 args = parser.parse_args()
@@ -34,5 +34,5 @@ with open(f'{args.category}/{args.name}.tex', 'w+') as f:
 with open(f'{args.category}/header.tex', 'a') as f:
     f.write(f'\\import{{}}{{{args.name}}}\n')
     
-print(f'New directory created at {args.category}/{args.name}.tex')
+print(f'New file created at {args.category}/{args.name}.tex')
 print("Completed successfully!")
