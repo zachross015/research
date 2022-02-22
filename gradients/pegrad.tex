@@ -21,9 +21,9 @@ The per example gradient norm is computed with respect both to the example and
 the layer, such that the gradient norm for layer $i$ and example $j$ is 
 \begin{equation}
     \label{eq:pegrad}
-    {\left\Vert\pdv{\cal{L}^{(j)}}{\mat{W}^{(i)}}\right\Vert}^2 = \sum_{k,l}
-    {\left(\pdv{\cal{L}^{(j)}}{W_{k, l}^{(i)}}\right)}^2.
-\end{equation} 
+    {\left\Vert\dv{\cal{L}^{(j)}}{\mat{W}^{(i)}}\right\Vert}^2 = \sum_{k,l}
+    {\left(\pdv{\cal{L}^{(j)}}{W_{k, l}^{(i)}}\right)}^2,
+\end{equation} which is just the frobenius norm.
 The proposed method
 makes use of $\mat{H}^{(i)}$ whose $j$th row contains the activation layer
 $\vec{h}^{(i)}$ corresponding to $\cal{B}^{(j)}$ i.e.\ $\mat{H}^{(i)}_j =
@@ -35,7 +35,7 @@ backpropagation. This gives us
     {\left\Vert\pdv{\cal{L}^{(j)}}{\mat{W}^{(i)}}\right\Vert}^2 = \left(\sum_k{\left(\bar{Z}_{j,k}^{(i)}\right)}^2\right)
                 \left(\sum_k{\left(H_{j,k}^{(i - 1)}\right)}^2\right) 
                 = {\left\Vert \bar{\vec{Z}}_j^{(i)}\right\Vert}^2{\left\Vert
-                \vec{H}_j^{(i - 1)}\right\Vert}^2
+                \vec{H}_j^{(i - 1)}\right\Vert}^2.
 \end{equation}
 
 \subsubsection{Commentary}

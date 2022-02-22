@@ -1,8 +1,13 @@
 import argparse
 import os
 
+excluded_dirs = ['.git', 'build']
+subdirs = [o for o in os.listdir('.') if os.path.isdir(os.path.join('.', o)) and o not in excluded_dirs]
+subdirs.sort()
+print(subdirs)
+
 parser = argparse.ArgumentParser(description='Creating new research files dynamically with little effort.')
-parser.add_argument('-c', '--category', required=True, type=str, help='Specify the category for which this research belongs')
+parser.add_argument('-c', '--category', required=True, type=str, help='Specify the category for which this research belongs. The available categories are: ' + ', '.join([d for d in subdirs]))
 parser.add_argument('-n', '--name', required=True, type=str, help='Name the file and section reference')
 
 

@@ -27,11 +27,11 @@ method for IGC is
 \end{equation} where the recursion is defined by base case $x_{0, 0}$ and
 iterative step $x_{k, 0} = x_{k - 1, m}$ and is more cyclical by nature. 
 
-Our clipping function $\cal{C} : \R^n \rightarrow \R^n$ with clipping threshold
+The clipping function $\cal{C} : \R^n \rightarrow \R^n$ with clipping threshold
 parameter $\eta > 0$ is defined by 
 \begin{equation}
-    \cal{C}(g;\eta) = \min\left\{1, \frac{\eta}{\norm{g}}\right\} \cdot g
-\end{equation}. Our iterative methods can take advantage of clipping by clipping
+    \cal{C}(g;\eta) = \min\left\{1, \frac{\eta}{\norm{g}}\right\} \cdot g.
+\end{equation} Our iterative methods can take advantage of clipping by clipping
 the gradient so that SGD with clipping is 
 \begin{equation}
     x_{k+1} = x_{k}  - \alpha_k \cal{C}(\grad f_{i_k}(x_k); \eta),
@@ -39,3 +39,47 @@ the gradient so that SGD with clipping is
 \begin{equation}
     x_{k, i} = x_{k, i -1} - \alpha_k \cal{C}(\grad f_i(x_{k, i - 1}); \eta).
 \end{equation}
+
+For the theoretical understanding of the clipping function's effects on the
+convergence of both SGD and IGC, we make the following assumptions:
+\begin{description}
+    \item[Bounded below] there exists an $f^*$ such that for all $x \in \R^n$,
+        $f(x) \geq f^*$;
+    \item[Relaxed smoothness] there exist constants $L_0, L_1 \in \R^+$ such
+        that $\norm{\grad^2f(x)} \leq L_0 + L_1 \norm{\grad f(x)}$.
+\end{description} The second condition becomes Lipschitz smoothness when $L_1 =
+0$. Let $f_k = f(x_k)$ and assume for simplicity from here on out that SGD and
+IGC have a constant step size $\alpha$ and that IGC's notation for $x_{k, i}$
+can be simplified for $x_{k, 0}$ to $x_k$. The paper shows that convergence for
+the algorithm can be ensured if there exists a constant $C$ such that 
+\begin{equation}
+    \label{eq:neccond}
+    \begin{aligned}
+    \dotp{\sum_{i = 1}^m \cal{C}(\grad f_i(x_k); \eta), \grad f_k} \geq C
+        \norm{\grad f_k}^2 \\
+    \end{aligned}
+\end{equation} i.e.\ if the magnitude of the clipped gradient projected in the
+direction of the regular gradient is bounded below by the magnitude of the
+regular gradient. This value is simplified further as follows.
+
+Let $g_{ki} = \grad f_i(x_k)$ and note the following properties of $g_{ki}$
+\begin{equation}
+    g_{ki} = \beta_{ki}\grad f_k + t_{ki} \quad \text{where} \quad
+    \begin{aligned}
+        &\beta_{ki} = \frac{\dotp{g_{ki}, \grad f_k}}{\norm{\grad f_k}^2} =
+        \frac{\norm{g_{ki}}}{\norm{\grad f_k}} \cos \theta_{ki} \\ \\
+        &t_{ki} \in \grad f_k^{\perp} = \{ z | \dotp{z, \grad f_k} = 0\}
+    \end{aligned}.
+\end{equation} Since $\frac{1}{m}\sum_{i}^m g_{ki} = \grad f_k$, it is a
+necessary condition that $\sum_{i}^m \beta_{ki} = m$ and $\sum_{i}^m t_{ki} =
+0$. Let $\gamma_{ki} = \min\{1, \eta/\norm{g_{ki}}\}$ and note that
+$\cal{C}(g_{ki}; \eta) = \gamma_{ki}g_{ki}$. The paper then shows that 
+\begin{equation}
+    \dotp{\sum_{i = 1}^m \cal{C}(\grad f_i(x_k); \eta), \grad f_k} = \sum_{i =
+    1}^m \gamma_{ki}\beta_{ki}\norm{\grad f_k}^2.
+\end{equation} so that \refeq{neccond} becomes 
+\begin{equation}
+    \label{eq:conv}
+    \sum_{i = 1}^m \gamma_{ki}\beta_{ki} \geq C,
+\end{equation} that is, \emph{the necessary condition for convergence is that
+the sum in \refeq{conv} is greater than some positive scalar $C$}.
