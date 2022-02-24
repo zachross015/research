@@ -15,7 +15,7 @@ Let each layer of a neural network be defined by the standard transformations
 loss function $\cal{L}$. Let $\cal{B} \subset \cal{D}$ be a minibatch of the input
 dataset
 $\cal{D}$, and let $\cal{B}^{(j)}$ be the $j$th example in the minibatch with
-$\cal{L}^{(j)}$ corresponding to the loss of $\cal{B}^{(j)}$ and $C =
+$\cal{L}^{(j)}$ corresponding to the loss of $\cal{B}^{(j)}$ and cost function $C =
 \sum_{j=1}^n\cal{L}^{(j)}$.
 The per example gradient norm is computed with respect both to the example and
 the layer, such that the gradient norm for layer $i$ and example $j$ is 
@@ -23,7 +23,11 @@ the layer, such that the gradient norm for layer $i$ and example $j$ is
     \label{eq:pegrad}
     {\left\Vert\dv{\cal{L}^{(j)}}{\mat{W}^{(i)}}\right\Vert}^2 = \sum_{k,l}
     {\left(\pdv{\cal{L}^{(j)}}{W_{k, l}^{(i)}}\right)}^2,
-\end{equation} which is just the frobenius norm.
+\end{equation} which is just the frobenius norm. Note that this equation can be
+used to calculate the $L_2$ norm of the parameter gradient for an example or
+the $L_2$ norm of the gradient for an individual weight matrix by summing over
+$j$ or $i$, respectively.
+
 The proposed method
 makes use of $\mat{H}^{(i)}$ whose $j$th row contains the activation layer
 $\vec{h}^{(i)}$ corresponding to $\cal{B}^{(j)}$ i.e.\ $\mat{H}^{(i)}_j =
