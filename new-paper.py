@@ -33,7 +33,7 @@ if not os.path.exists(args.category):
 
 
 with open(f'{args.category}/{args.name}.tex', 'w+') as f:
-    f.write(f'% \\subsection{{\\sectioncite{{{args.name}}}}}\n')
+    f.write(f'% \\section{{\\sectioncite{{{args.name}}}}}\n')
     f.write(f'% \\label{{sec:{args.name}}}\n')
 
 with open(f'{args.category}/header.tex', 'a') as f:

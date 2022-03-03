@@ -1,5 +1,22 @@
-\section{Neural Network Pruning}%
-\label{sec:neural_network_pruning}
+\part{Neural Network Pruning}%
+\label{prt:neural_network_pruning}
+
+In the following research, we make use frequently of the set of parameters
+$\theta$. A couple things to note about how this is used: it is common practice
+to reference the set of parameter in a multitude of ways, none of which is
+extrapolated upon in any papers I've come across and has been entirely
+frustrating to decipher on its own. $\theta$ is often referred to a set of
+parameters rather than a collection, yet is often assigned an ordering of
+arbitrary dimensionality. I will attempt to disclose my understanding of this
+dimensionality and these short-hands briefly
+\begin{enumerate}
+    \item $\theta_i$ is access to some arbitrary element of $\theta$,
+    \item $\theta_i^{(l)}$ is the $i^\th$ row in the matrix of parameters at layer $l$, 
+    \item and $\theta^{(l)}_{i, j}$ is the element in the $i^\th$ row and $j^\th$
+        column of the matrix of parameters at layer $l$. This is periodically
+        shorthanded to $\theta_{i, j}$ when authors assume an arbitrary
+        layer.
+\end{enumerate} Unless otherwise mentioned, these will be used throughout.
 
 \import{}{synflow}
 \import{}{lth}

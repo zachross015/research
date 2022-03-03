@@ -1,6 +1,6 @@
-\subsection{An Introduction to Quantitative Finance}
+\chapter{\sectioncite{blyth}}
 
-\subsubsection{Interest Rates}
+\section{Interest Rates}
 
 \begin{definition}
     A \emph{notional} or \emph{principal} is an initial deposit or value $N$.
@@ -8,8 +8,8 @@
 
 \begin{definition}
     \label{def:irate}
-    An \emph{interest rate} $r$ is the rate at which a value is increased according to
-    a specified frequency of time. 
+    An \emph{interest rate} $r$ is the rate at which a value is increased
+    according to a specified frequency of time. 
 \end{definition}
 
 Suppose we have an account with interest rate $r$ and notional $N$. The value of 
@@ -23,11 +23,13 @@ is far more mathematically efficient. That being said, discrete analogs will be
 used sparsely and we will primarily depend on continuous equations. The discrete
 versions can be derived from the continuous versions by noting that
 \begin{equation}
+    \label{eq:rtone}
     e^{rT} = {\left(1 + \frac{r_m}{m}\right)}^{mT}
 \end{equation} where $T$ is commonly denoted as the time in years, $m$ is the
 frequency the interest is compounded, and $r_m$ is the equivalent interest rate
 with the discrete frequency. $r_m$ can then be recovered from $r$ using
 \begin{equation}
+    \label{eq:rttwo}
     r_m = m\left(e^{\left(\frac{r}{m}\right)} - 1\right).
 \end{equation}
 
@@ -51,4 +53,124 @@ with the discrete frequency. $r_m$ can then be recovered from $r$ using
 The intuition behind the present values for a ZCB derives from the fact that if
 we have two portfolios, one a ZCB with maturity $T$ and another that contains
 cash which will accumulate interest to be worth 1 at time $T$, then both will be
-worth the same price at each $t$ leading up to $T$ and thereafter.
+worth the same value at each $t$ leading up to $T$ and thereafter.
+
+\begin{definition}
+    An \emph{annuity} a series of fixed cashflows at specified times $T_i = 1,
+    \dots, n$. The value at time $t$ is given by 
+    \begin{equation}
+        \label{eq:annuity}
+        V = C\sum_{i = 1}^n Z(t, T_i).
+    \end{equation}
+\end{definition}
+When we substitute in \refeq{zcb}, we notice that this is just a geometric
+series. Because of this, if an annuity is payed once a year for $M$ years with
+rate $r$, this
+equates to 
+\begin{equation}
+    V = \sum_{i = 1}^n \frac{1}{{(1 + r)}^i} = \frac{1}{r}\left(1 - \frac{1}{{(1 + r)}^M}\right)
+\end{equation}
+
+\begin{definition}
+    The \emph{accrual factor} is (under the discrete analogy) the frequency
+    which interest is compounded, and is denoted as $\alpha$.
+\end{definition}
+
+\begin{table}[t]
+    \centering
+    \caption{Daycount conventions and accrual factors}
+    \label{tab:dccon}
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{Daycount convention} & \textbf{$\alpha$ for 16 December 2011 -
+        16 March 2012} \\
+        \midrule
+        act/365 & 91/365 \\
+        act/act & 15/365 + 76/366 \\
+        act/360 & 91/360 \\
+        30/365 & 1/4 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+In Equations~\ref{eq:rtone} and~\ref{eq:rttwo}, this is the same as taking
+$\alpha = 1/m$. Due to the year being uneasily divided by simple values of
+$\alpha$, several \emph{daycount conventions} have been made for different
+settings. We list these in Table~\ref{tab:dccon}. The daycount conventions are
+seemingly deceptive in that they hide various details behind terminology. For
+example, two cases are 30/x and x/360, which respectively denote that each month
+in the period should be counted as only having 30 days and each month in a year
+should be counted as only having 30 days. I want to emphasize the weird
+convention because when we encounter a fraction in the work such as 30/act, this
+means to say that if we specify a period of three months, then this fraction
+actually denotes 
+\begin{equation}
+    \frac{30 * 3}{m_1 + m_2 + m_3}
+\end{equation} where each $m_i$ is the number of actual days in the specified
+month. Like wise, if we have a daycount act/act, this denotes the number specifies
+the number of actual days in the period divided by the actual days in the year.
+If we have a leap year, then the denominator contains 366, whereas if February
+is included in the daycount, then we may have 28 or 29 days dependent on the
+year. I hope this helps to explain it better, if not then \emph{oof}.
+
+A few specific cases arise but are only defined in the exercises. I will list
+those here.
+
+\begin{definition}
+    \emph{Semi-bond} is the US dollar interest rate which is semi-annual
+    compounding with 30/360 daycount and is denoted as $\gamma_{SB}$.
+\end{definition}
+
+\begin{definition}
+    \emph{Annual money} is the US dollar interest rate which is annual
+    compounding with act/360 daycount and is denoted as $\gamma_{AM}$.
+\end{definition}
+
+If we know the rate $r_{\alpha}$ and accrual factor $\alpha$ of a quoted
+interest rate over a specified period of time, and we are interested in the
+equivalent rate $r_\beta$ under a different accrual factor $\beta$ over the same
+period of time, then this information can be retrieved by making note of the
+equivalency 
+\begin{equation}
+    r_\alpha\alpha = r_\beta\beta.
+\end{equation} This makes conversions simple as demonstrated by the following
+example. 
+
+\begin{example}
+    If on 16 December 2011 the act/365 rate for three months is $5\%$, the
+    act/360 rate is 
+    \begin{equation}
+        r_\beta = r_\alpha\frac{\alpha}{\beta} = 5\% \frac{\text{act/365}}
+        {\text{act/360}} = 5\%\frac{360}{365} = 4.9315\%.
+    \end{equation}
+\end{example}
+
+\begin{example}
+    The conversion between semi-bonds and annual money is given by 
+    \begin{equation}
+        \gamma_{SB}\frac{30}{360} = \gamma_{AM}\frac{\text{act}}{360},
+    \end{equation}
+    so that 
+    \begin{equation}
+        \gamma_{SB} = \gamma_{AM}\frac{\text{act}}{30},
+    \end{equation} and likewise
+    \begin{equation}
+        \gamma_{AM} = \gamma_{SB}\frac{30}{\text{act}}.
+    \end{equation}
+\end{example}
+
+\begin{definition}
+    A \emph{stock} or \emph{share} is an asset giving ownership in a fraction of
+    a company. The price at time $t$ of a stock is denoted by $S_t$. The current
+    known price is called the \emph{spot}.
+\end{definition}
+
+\begin{definition}
+    A \emph{fixed rate bond} with coupon $c$ and notional $N$ is an asset that
+    pays a coupon $cN$ at a specified frequency (usually a year) and $N$ at its
+    maturity date $T$. A \emph{floating rate bond} is defined similarly with a
+    variable interest rate.
+\end{definition}
+
+
+
