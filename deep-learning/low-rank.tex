@@ -1,2 +1,94 @@
-% \section{\sectioncite{low-rank}}
-% \label{sec:low-rank}
+\chapter{\sectioncite{low-rank}}
+\label{cha:low-rank}
+
+This paper focuses on an improvement on Deep Neural Networks (specifically ones
+involving convolutional layers) by utilizing the SVD of a convolution and
+sparsifying the underlying singular values. This is done by representing the
+kernel $\tensor{K}$ of a convolution as a 4-D tensor with dimension $\tensor{K}
+\in \R^{n \times c \times w \times h}$ where $n$ is the number of filters
+(output channels), $c$ is the number of input channels, and $w, h$ are the
+width and height of the kernel respectively. They break the kernel down into the
+\emph{channel-wise decomposition} and the \emph{spatial-wise decomposition}.
+
+Under channel-wise decomposition, $\tensor{K}$ is reshaped into a 2-D matrix
+$\hat{\mat{K}} \in \R^{n \times cwh}$, which can be decomposed with SVD into
+$\mat{U} \in \R^{n \times r}$, $\mat{V} \in \R^{cwh \times r}$, and $\vec{s} \in
+\R^r$ where $\mat{U}, \mat{V}$ are unitary and $r = \min(n, cwh)$. The
+convolution then becomes the multiplication of convolutions $\tensor{K}_1 \in
+\R^{r \times c \times w \times h}$ (reshaped from
+$\diag{\sqrt{\vec{s}}}\mat{V}^\intercal$) and $\tensor{K}_2 \in \R^{c \times r
+\times 1 \times 1}$ (reshaped from $\mat{U}\diag{\sqrt{\vec{s}}}$), a
+simplification discovered by \cite{zhang}.
+
+Under spatial-wise decomposition, $\tensor{K}$ is reshaped into a 2-D matrix
+$\hat{\mat{K}} \in \R^{nw \times ch}$, which can be decomposed with SVD into
+$\mat{U} \in \R^{nw \times r}$, $\mat{V} \in \R^{ch \times r}$, and $\vec{s} \in
+\R^r$ where $\mat{U}, \mat{V}$ are unitary and $r = \min(n, cwh)$. The
+convolution then becomes the multiplication of convolutions $\tensor{K}_1 \in
+\R^{r \times c \times 1 \times h}$ (reshaped from
+$\diag{\sqrt{\vec{s}}}\mat{V}^\intercal$) and $\tensor{K}_2 \in \R^{c \times r
+\times 1 \times 1}$ (reshaped from $\mat{U}\diag{\sqrt{\vec{s}}}$).
+
+In either case, the SVD decomposition of the matrix is stored in memory rather
+than the convolution, and the convolution is reconstructed from these matrices.o
+
+Since the assurance that $\mat{U}, \mat{V}$ are orthogonal is a costly
+procedure, an orthogonality regularizer is added to the cost of the loss
+function. This orthogonality regularizer is given by 
+\begin{equation}
+    \label{eq:orthloss}
+    L_o(\mat{U}, \mat{V}) = \frac{1}{r^2}\left(\norm{\mat{U}^\intercal\mat{U} -
+    \mat{I}}_F^2 + \norm{\mat{V}^\intercal\mat{V} -
+    \mat{I}}_F^2\right).
+\end{equation} This assures that the matrices will be approximately
+semi-unitarythe matrices will be approximately semi-unitary. Note that they can
+not be orthogonal since they are not square.
+
+\begin{figure}[t]
+    \label{fig:hoyer}
+    \caption{Effect of applying different sparsity-inducing regularizers during
+    SVD training. All models are achieved with Spatial-wise decomposition.}
+    \includegraphics[width=0.8\linewidth]{../images/hoyer.png}
+\end{figure}
+
+As part of the sparsification, another regularizer is used for sparsifying the
+singular values. This regularizer was tested using both the $L^1$ norm and a
+\emph{Hoyer regularizer}, given by 
+\begin{equation}
+    L^H(\vec{s}) = \frac{\norm{\vec{s}}_1}{\norm{\vec{s}}_2}.
+\end{equation} 
+The results given by \reffig{hoyer} show that while the $L^1$ regularizer
+doesn't match the performance/accuracy tradeoff of the hoyer regularizer,
+allowing for a higher accuracy loss can result in better performance by the
+$L^1$ regularizer. I.e.\ extremely large compression rates which result in
+higher accuracy loss can provide a more generous reduction in #FLOPs under
+$L^1$, whereas having a more moderate compression and a lower accuracy loss has
+better reduction of #FLOPs under $L^H$.
+
+The overall objective function is finally given by 
+\begin{equation}
+    L(\mat{U}, \vec{s}, \mat{V}) = L_T(\diag{\sqrt{\vec{s}}}\mat{V}^\intercal,
+    \mat{U}\diag{\sqrt{\vec{s}}}) + \lambda_o \sum_{l = 1}^D L_o\left(\mat{U}^{(l)},
+    \mat{V}^{(l)}\right) + \lambda_s \sum_{l = 1}^D L_s\left(\vec{s}^{(l)}\right),
+\end{equation} where $L_T$ is the training loss computed with decomposed layers,
+$L_o$ is the orthogonality loss from \refeq{orthloss}, $L_s$ is the
+sparsity-inducing regularization loss (either $L^1$ or $L^H$), and $\lambda_o,
+\lambda_s$ are hyperparameters for controlling the effect of the objective
+functions on the overall loss. The paper demonstrates that the change in
+accuracy from changing $\lambda_o = 1.0$ to $\lambda_o = 0.0$ is about $-2.0\%$,
+showing that the orthogonality causes a definite change in performance.
+
+As for pruning, an energy threshold $e \in [0, 1]$ is a hyperparameter which
+for each layer, a set $\bb{K}$ is determined containing the largest number of
+singular values s.t.\ 
+\begin{equation}
+    \sum_{j \in \bb{K}}s_j^2 \leq e \sum_{i = 1}^r s_i^2.
+\end{equation}
+The values in $\bb{K}$ are then pruned by setting each $s_j = 0$.
+
+
+
+\TODO{Fill in some details on channel-wise and spatial-wise decomposition
+because I have no idea what either of these things are}.
+
+
