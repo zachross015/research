@@ -1,0 +1,108 @@
+\chapter{\sectioncite{stabilizing-gradients}}
+\label{sec:stabilizing-gradients}
+
+\begin{abstract}
+    \citefield{stabilizing-gradients}{abstract}
+\end{abstract}
+
+The primary contributions of the paper is in 
+\begin{itemize}
+    \item paramterizing transition matrices through SVD and householder reflectors;
+    \item applying SVD paramterization to RNNs to exert constraints on their
+        transition matrices, and
+    \item verifying their modification outperforms the original RNN networks.
+\end{itemize}
+They also theoretically validate their methods as well as show that it
+alleviates the gradient vanishing/exploding problem.
+
+They define the SVD of a transition matrix $\mat{W} \in \R^{n \times n}$ as
+given by $\mat{W} = \mat{U} \mat{\Sigma} \mat{V}^\intercal$ where $\mat{\Sigma}$ is the diagonal matrix of
+singular values and $\mat{U}, \mat{V} \in \R^{n \times n}$ are orthogonal.
+
+\begin{definition}
+    Given a vector $\vec{u} \in \R^k$, $k \leq n$, the Householder Reflector
+    $\cal{H}_k^n(\vec{u})$ is 
+    \begin{equation}
+        \cal{H}_k^n(\vec{u}) = \begin{cases}
+            \bmat{\mat{I}_{n - k} & \mat{0} \\ \mat{0} & \mat{I}_k -
+            2\frac{\vec{u}\vec{u}^\intercal}{\norm{\vec{u}}^2}}, & \vec{u} \neq
+            \vec{0} \\
+            \mat{I}_n, & \text{otherwise.}
+        \end{cases}
+    \end{equation}
+\end{definition}
+When $n$ is well-defined, the previous function is shorthanded to
+$\cal{H}_k(\vec{u})$.
+
+Let $\bb{O}(n)$ be the set of $n \times n$ orthogonal matrices. The following maps
+are established as precursors to the primary theorems of the paper:
+\begin{equation}
+    \begin{aligned}
+        \cal{M}_k : \R^k \times \cdots \times \R^n &\rightarrow \R^{n \times n}
+        \\
+        \cal{M}_k(\vec{u}_k, \dots, \vec{u}_n) &\mapsto
+        \cal{H}_n(\vec{u}_n)\cdots\cal{H}_k(\vec{u}_k),
+    \end{aligned}
+\end{equation} and 
+
+\begin{equation}
+    \label{eq:specmap}
+    \begin{aligned}
+        \cal{M}_{k_1, k_2} : \R^{k_1} \times \cdots \times \R^n \times \R^{k_2} \times
+        \cdots \times \R^n \times \R^n &\rightarrow \R^{n \times n}
+        \\
+        \cal{M}_{k_1, k_2}(\vec{u}_{k_1}, \dots, \vec{u}_n, \vec{v}_{k_1},
+        \dots, \vec{v}_n, \vec{\sigma}) &\mapsto \\
+        \cal{H}_n(\vec{u}_n)\cdots\cal{H}_{k_1}(\vec{u}_{k_1})\text{diag}(\vec{\sigma})\cal{H}_{k_2}(\vec{v}_{k_2})\cdots\cal{H}_n(\vec{v}_n).
+    \end{aligned}
+\end{equation}
+
+\begin{theorem}
+    $\im{\cal{M}_1} = \bb(n)$ is the set of all $n \times n$ orthogonal matrices.
+\end{theorem}
+
+\begin{theorem}
+    $\im{\cal{M}_{1, 1}}$ is the set of all $n \times n$ real matrices. 
+\end{theorem}
+
+\begin{theorem}
+    $\im{\cal{M}_{k_1, k_2}}$ includes the set of all orthogonal $n \times n$
+    matrices if $k_1 + k_2 \leq n + 2$.
+\end{theorem}
+
+These definitions can be extended to the case of $\mat{W} \in \R^{m \times n}$
+by taking 
+\begin{equation}
+    \mat{W} = \mat{U}(\mat{\Sigma}|\mat{0}){(\mat{V}_L|\mat{V}_R)}^\intercal =
+    \mat{U}\mat{\Sigma}\mat{V}_L^\intercal,
+\end{equation} where $\mat{U} \in \R^{m \times m}$, $\mat{\Sigma} \in
+\text{diag}(\R^m)$, and $\mat{V}_L \in \R^{n \times m}$. \refeq{specmap} can
+then be extended as 
+\begin{equation}
+    \label{eq:specmap2}
+    \begin{aligned}
+        \cal{M}^{m,n}_{k_1, k_2} : \R^{k_1} \times \cdots \times \R^m \times \R^{k_2} \times
+        \cdots \times \R^n \times \R^{\min(m, n)} &\rightarrow \R^{m \times n}
+        \\
+        \cal{M}^{m,n}_{k_1, k_2}(\vec{u}_{k_1}, \dots, \vec{u}_m, \vec{v}_{k_1},
+        \dots, \vec{v}_n, \sigma) &\mapsto \\
+        \cal{H}^m_m(\vec{u}_m)\cdots\cal{H}^m_{k_1}(\vec{u}_{k_1})\mat{\hat{\Sigma}}\cal{H}^n_{k_2}(\vec{v}_{k_2})\cdots\cal{H}^n_n(\vec{v}_n).
+    \end{aligned}
+\end{equation} where $\mat{\hat{\Sigma}} = (\text{diag}(\vec{\sigma})|\vec{0})$ if $m
+< n$ and ${(\text{diag}(\vec{\sigma})|\vec{0})}^\intercal$ otherwise. This leads
+to the following lemma and consequently theorem:
+\begin{lemma}
+    Given $\set{v_i}_{i = 1}^n$, define $V^{(k)} = \cal{H}_n^n(\vec{v}_n) \cdots
+    \cal{H}_k^n(\vec{v}_k)$ for $k \in [n]$. We have:
+    \begin{equation}
+        V_{*, i}^{(k_1)} = V_{*, i}^{(k_2)}, \forall k_1, k_2 \in [n], i \leq
+        \min(n - k_1, n - k_2).
+    \end{equation}
+\end{lemma}
+\begin{theorem}
+    If $m \leq n$, $\im{\cal{M}_{1, n - m + 1}^{m, n}}$ is the set of all $m
+    \times n$ matrices; else the image of $\im{\cal{M}_{n - m + 1, 1}^{m, n}}$
+    is the set of all $m \times n$ matrices.
+\end{theorem}
+
+\TODO{Write up notes on the analysis of this paper.}
