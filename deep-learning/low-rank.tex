@@ -41,14 +41,14 @@ function. This orthogonality regularizer is given by
     \mat{I}}_F^2 + \norm{\mat{V}^\intercal\mat{V} -
     \mat{I}}_F^2\right).
 \end{equation} This assures that the matrices will be approximately
-semi-unitarythe matrices will be approximately semi-unitary. Note that they can
+semi-unitary. Note that they can
 not be orthogonal since they are not square.
 
 \begin{figure}[t]
     \label{fig:hoyer}
     \caption{Effect of applying different sparsity-inducing regularizers during
     SVD training. All models are achieved with Spatial-wise decomposition.}
-    \includegraphics[width=0.8\linewidth]{../images/hoyer.png}
+    %\includegraphics[width=0.8\linewidth]{../images/hoyer.png}
 \end{figure}
 
 As part of the sparsification, another regularizer is used for sparsifying the
@@ -61,9 +61,9 @@ The results given by \reffig{hoyer} show that while the $L^1$ regularizer
 doesn't match the performance/accuracy tradeoff of the hoyer regularizer,
 allowing for a higher accuracy loss can result in better performance by the
 $L^1$ regularizer. I.e.\ extremely large compression rates which result in
-higher accuracy loss can provide a more generous reduction in #FLOPs under
+higher accuracy loss can provide a more generous reduction in \#FLOPs under
 $L^1$, whereas having a more moderate compression and a lower accuracy loss has
-better reduction of #FLOPs under $L^H$.
+better reduction of \#FLOPs under $L^H$.
 
 The overall objective function is finally given by 
 \begin{equation}
