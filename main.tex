@@ -11,6 +11,8 @@
 
 % References 
 \newcommand{\sectioncite}[1]{\citefield{#1}{title}~\cite{#1}}
+\renewcommand{\chaptermark}[1]{\markboth{\chaptername\ \thechapter.\ #1}{}}
+
 
 % Commonly used variables
 \newcommand{\crm}{\rho_{\max}}
@@ -18,8 +20,10 @@
 \newcommand{\thetaprune}{\theta_{\text{prune}}}
 \renewcommand{\th}{\en{\text{th}}}
 
+
 % Pruning paper
 \newcommand{\synapsemetric}[1]{\en{\dotp{\pdv{\cal{R}}{#1}, #1}}}
+
 
 \title{General Research Notes}
 \author{Zachary Ross}

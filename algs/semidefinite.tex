@@ -85,15 +85,15 @@ The analysis breaks apart into three cases:
 \end{enumerate}
 The general case constitutes defining the overall expected weight as in 
 \begin{equation}
-    \E{W} = \frac{1}{\pi} \sum_{i < j}W_{ij}\text{Pr}\left[\text{sgn}\left(\dotp{\vec{v}_i,
-    \vec{r}}\right) \neq \text{sgn}\left(\dotp{\vec{v}_j,
-    \vec{r}}\right)\right].
+    \E{W} = \frac{1}{\pi} \sum_{i < j}W_{ij}\pr{\sgn{\dotp{\vec{v}_i,
+    \vec{r}}} \neq \sgn{\dotp{\vec{v}_j,
+    \vec{r}}}}.
 \end{equation} They then state the following lemma:
 \begin{lemma}
     \begin{equation}
-        \text{Pr}\left[\text{sgn}\left(\dotp{\vec{v}_i,
-        \vec{r}}\right) \neq \text{sgn}\left(\dotp{\vec{v}_j,
-        \vec{r}}\right)\right] = \frac{1}{\pi} \arccos(\dotp{\vec{v}_i,
+        \pr{\sgn{\dotp{\vec{v}_i,
+        \vec{r}}} \neq \sgn{\dotp{\vec{v}_j,
+        \vec{r}}}} = \frac{1}{\pi} \arccos(\dotp{\vec{v}_i,
         \vec{v}_j}),
     \end{equation}
 \end{lemma} \noindent which follows from the fact that the probability that these two values

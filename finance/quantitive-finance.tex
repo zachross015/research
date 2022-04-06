@@ -1,5 +1,15 @@
 \chapter{\sectioncite{blyth}}
 
+It is important to note that I only present the conclusions to propositions
+presented in this book rather than deriving the proofs themselves. This is
+especially the case whenever I list out the value of any derivative: these
+values are derived in the book using various proofs and are \emph{not} defined
+to have these values in the first place. For the most part, any derivative with
+maturity $T$ has a definitive value at maturity, but is a random variable up
+until that point. The book spends a good amount of time providing deterministic
+values for these r.v.s, and all that is generally listed here are these
+deterministic values.
+
 \section{Interest Rates}
 
 \begin{definition}
@@ -96,14 +106,14 @@ equates to
 In Equations~\ref{eq:rtone} and~\ref{eq:rttwo}, this is the same as taking
 $\alpha = 1/m$. Due to the year being uneasily divided by simple values of
 $\alpha$, several \emph{daycount conventions} have been made for different
-settings. We list these in Table~\ref{tab:dccon}. The daycount conventions are
-seemingly deceptive in that they hide various details behind terminology. For
-example, two cases are 30/x and x/360, which respectively denote that each month
-in the period should be counted as only having 30 days and each month in a year
-should be counted as only having 30 days. I want to emphasize the weird
-convention because when we encounter a fraction in the work such as 30/act, this
-means to say that if we specify a period of three months, then this fraction
-actually denotes 
+settings. We list a sample of these in Table~\ref{tab:dccon}. The daycount
+conventions are seemingly deceptive in that they hide various details behind
+terminology. For example, two cases are 30/x and x/360, which respectively
+denote that each month in the period should be counted as only having 30 days
+and each month in a year should be counted as only having 30 days. I want to
+emphasize the weird convention because when we encounter a fraction in the work
+such as 30/act, this means to say that if we specify a period of three months,
+then this fraction actually denotes 
 \begin{equation}
     \frac{30 * 3}{m_1 + m_2 + m_3}
 \end{equation} where each $m_i$ is the number of actual days in the specified
@@ -173,4 +183,141 @@ example.
 \end{definition}
 
 
+\section{Forward Contracts and Forward Prices}%
+\label{sec:forward_contracts_and_forward_prices}
 
+
+\begin{definition}
+    A \emph{derivative contract} (\emph{derivative}) is a financial
+    contract between two parties whose value derives from the value of another
+    variable.
+\end{definition}
+
+\begin{remark}
+    Derivatives are often defined by the payout at a specified time. E.g.\ if
+    $S_T$ indicates the total snowfall in inches at time $T$ then the weather
+    derivative $g(S_T)$ can be defined by
+    \begin{equation}
+        g(S_T) = I\set{S_T > 50} = \begin{cases}
+            \$1 &\text{if } S_T > 50 \\
+            0 &\text{otherwise},
+        \end{cases}
+    \end{equation} 
+    where both $S_T$ and $g(S_T)$ are random variables with unknown values until
+    $T = 1$.
+\end{remark}
+
+\begin{definition}
+    A \emph{forward contract} (\emph{forward}) is an agreement between two
+    counterparties to trade a specific asset at maturity $T$ with delivery price
+    $K$. At a time $t \leq T$, the buyer is \emph{long} the contract while the
+    seller is \emph{short} the contract. 
+\end{definition}
+
+The value at time $t \leq T$ of being long a forward contract is given by
+$V_K(t, T)$, where by construction we have that $V_K(T, T) = S_T - K$.
+
+\begin{definition}
+    The \emph{forward price} $F(t, T)$ at current time $t \leq T$ is the
+    delivery price $K$ s.t.\ $V_K(t, T) = 0$.
+\end{definition}
+
+\begin{remark}
+    The forward price can be seen as denoting the spot price at maturity, so in
+    essence you will be agreeing at time $t \leq T$ to trade the asset at time
+    $T$ for its actual price. If you had $K < F(t, T)$ then the person long the
+    contract has a better deal since they would pay less than the appreciated
+    value (i.e.\ you could just sell the asset for profit), whereas $K > F(t,
+    T)$ provides the better deal for the short since they would receive more
+    than the appreciated value.
+\end{remark}
+
+\begin{table}[h]
+    \centering
+    \caption{Forward prices for various assets}
+    \label{tab:forwardprices}
+    \begin{tabular}{lr}
+        \toprule
+        \textbf{Underlying} & \textbf{Forward price} \\
+        \midrule
+        Asset paying no income & ${S_t}e^{r(T-t)}$ \\
+        Asset paying known income $I$ & $({S_t} - I)e^{r(T-t)}$ \\
+        Asset paying dividends at rate $q$ & ${S_t}e^{(r - q)(T-t)}$ \\
+        Foreign exchange & ${X_t}e^{(r_\$ - r_f)(T-t)}$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The forward price is decided under various conditions, those being listed in
+Table~\ref{tab:forwardprices}. Given the forward price, we derive the value of
+being long a forward contract as 
+\begin{equation}
+    V_K(t, T) = (F(t, T) - K)e^{-r(T-t)}.
+\end{equation}
+
+As a final note, this chapter begins to discuss proof methods for deriving the
+values of derivatives. It's fairly instructional to review these as they form
+the basis for evaluating many assets, so we shall include the definitions and
+some proof examples below.
+
+\begin{definition}
+    A \emph{replication proof} is one where we prove the value of an asset by
+    demonstrating that if two portfolios always have the same value at time $T$ and
+    if neither add/subtract anything of non-zero value between $t$ and $T$, then
+    they must have the same value at $t \leq T$.
+\end{definition}
+
+\begin{definition}
+    \emph{Arbitrage} is a situation where, starting with an empty portfolio, a
+    sequence of simple market transactions will end up with a positive portfolio
+    value at time $T$.
+\end{definition}
+
+\begin{definition}
+    A \emph{no-arbitrage proof} uses the assumption that no arbitrage situations
+    exist, i.e.\ all market transactions have an equivalent exchange.
+\end{definition}
+
+\begin{remark}
+    Most no-arbitrage proofs are constructed similarly to a proof by
+    contradiction. 
+\end{remark}
+
+It's often informative constructing no-arbitrage proofs since they force you to
+think about situations in which you can exploit an arbitrage if detected. We
+demonstrate no-arbitrage proofs and replication proofs in the following
+examples.
+
+\begin{example}
+    Let $S_t$ be the current stock of a price paying no income. Let $r_{BID}$ be
+    the interest rate at which one can invest/lend money, and $r_{OFF}$ be the
+    interest rate at which one can borrow money, $r_{BID} \leq r_{OFF}$. Both
+    rates are continuously compounded. Using arbitrage arguments, find upper and
+    lower bounds for the forward price of the stock for a forward contract with
+    maturity $T > t$.
+\end{example}
+
+\begin{solution}
+    Assume that $F(t, T) > {S_t}e^{r_{OFF}(T-t)}$. At time $t$, we could short a
+    forward contract with forward price $F(t, T)$ (which is done at no upfront
+    cost since $V_{F(t, T)}(t, T) = 0$), take out a loan for $S_t$ at rate
+    $r_{OFF}$ for time $T - t$, and purchase the asset for $S_t$. Then at time
+    $T$, we would execute the forward contract, selling the stock for $F(t, T)$
+    and paying back the loan with appreciated value ${S_t}e^{r_{OFF}(T-t)}$,
+    leaving us with $F(t, T) - {S_t}e^{r_{OFF}(T-t)} > 0$. This provides an
+    upper bound under the assumption of no-arbitrage.
+
+    Assume that $F(t, T) < S_{t}e^{r_{BID}(T - t)}$. At time $t$, we could long
+    a forward contract with forward price $F(t, T)$, borrow the asset $S_t$,
+    sell the asset and invest/lend the remains at the rate $r_{BID}$ for time $T
+    - t$. Then at time $T$, we receive $S_{t}e^{r_{BID}(T - t)}$ at the maturity
+    of the deposit, which we can can use $F(t, T)$ of to execute the forward
+    contract and return the underlying asset. This leaves us with $
+    S_{t}e^{r_{BID}(T - t)} - F(t, T) > 0$. This provides a lower bound under
+    the assumption of no-arbitrage.
+
+    Our bounds then come out to 
+    \begin{equation}
+        S_{t}e^{r_{BID}(T - t)} \leq F(t, T) \leq S_{t}e^{r_{OFF}(T - t)}.
+    \end{equation}
+\end{solution}
