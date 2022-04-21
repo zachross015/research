@@ -35,8 +35,8 @@ if not os.path.exists(args.category):
 
 with open(f'{args.category}/{args.name}.tex', 'w+') as f:
     f.write(f'\\chapter{{\\sectioncite{{{args.name}}}}}\n')
-    f.write(f'\\label{{sec:{args.name}}}\n\n')
-    f.write(f'\\TODO{(Read the paper and insert information here.)}')
+    f.write(f'\\label{{cha:{args.name}}}\n\n')
+    f.write(f'\\TODO{{(Read the paper and insert information here.)}}')
 
 with open(f'{args.category}/header.tex', 'a') as f:
     f.write(f'\\import{{}}{{{args.name}}}\n')
