@@ -2,3 +2,37 @@
 \label{cha:treewidth-lecture}
 
 \TODO{(Read the paper and insert information here.)}
+
+\begin{definition}
+    \label{def:treedecomp}
+    A \emph{tree decomposition} of a graph $G = (V, E)$ is a pair 
+    \begin{equation}
+        (\set{X_i\ |\ i \in I}, T = (I, M))
+    \end{equation}
+    where $\set{X_i\ |\ i \in I}$ is a collection of subsets $V$ (also called
+    \emph{bags}), and $T$ is a tree s.t. 
+    \begin{itemize}
+        \item $\cup_{i \in I} X_i = V$ (combining the vertices of all bags forms
+            $V$)
+        \item $(u, v) \in E \implies \exists i \in I : u, v \in X_i$ (if
+            there is an edge connecting two vertices, then those vertices share
+            at least one bag)
+        \item $\forall v\in V: \set{i \in I\ |\ v \in X_i}$ induces a connected
+            subtree of $T$ (all bags involving a vertex $v$ form a connected
+            subtree).
+    \end{itemize}
+\end{definition}
+
+\begin{remark}
+    The last statement in \refdef{treedecomp} can be replaced with 
+    \begin{itemize}
+        \item $i, k, j \in I$ and $j$ is on the path from $i$ to $k$ in $T
+            \implies X_i \cap X_k \subseteq X_j$.
+    \end{itemize}
+\end{remark}
+
+\begin{lemma}
+    Let $(\set{X_i\ |\ i \in I}, T = (I, M))$ be a tree decomposition of $G =
+    (V, E)$, and let $K \subseteq V$ be a clique in $G$. Then $\exists i \in I
+    : K \subseteq X_i$.
+\end{lemma}

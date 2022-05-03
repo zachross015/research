@@ -1,4 +1,107 @@
-% \chapter{\sectioncite{scalable-opt}}%
-% \label{cha:scalable-grad}
+\chapter{\sectioncite{scalable-opt}}%
+\label{cha:scalable-grad}
+
+This paper uses a similar notation to that of \refcha{clipping} in that we
+consider the function \begin{equation}F_t = f_t(\beta) +
+\phi(\beta)\end{equation} where $f_t$ is a convex loss function, $\phi$ is a
+regularizer, and $\beta \in \R^p$ is the set of parameters.
+
+\begin{definition}
+    The \emph{regret} after $T$ rounds is defined as 
+    \begin{equation}
+        R(T) = \sum_{t = 1}^T F_t(\beta_t) - \sum_{t = 1}^T
+        F_t(\beta^{\text{opt}}),
+    \end{equation} where $\beta_t$ is the set of parameters at round $t$ and
+    $\beta^{\text{opt}}$ is a fixed optimal predictor.
+\end{definition}
+ 
+The paper proceeds to define $\vec{g}_t \in \grad f_t(\beta_t)$ as a
+\emph{subgradient} of the loss function, which we may view as a gradient
+obtained from a minibatch of our dataset. Standard, first-order methods use a
+fixed learning rate $\eta$ to move in the opposite direction of $\vec{g}_t$, but
+their method builds on second-order methods which use an adaptive learning rate
+which is controlled by a time-varying \emph{proximal term}, i.e.\ a function
+determining the adaptive learning rate. Given $\mat{G}_t = \sum_{i =
+1}^t \vec{g}_i\vec{g}_i^\intercal$ and $\mat{H}_t = \delta \mat{I}_p +
+\mat{G}_t^{1/2}$ The proximal terms for \textsc{AdaFull} and \textsc{AdaGrad} are
+given by 
+\begin{equation}
+    \psi_t(\beta) = \frac{1}{2}\dotp{\beta, \mat{H}_t \beta} \quad \text{and}
+    \quad \psi_t(\beta) = \frac{1}{2}\dotp{\beta, \left(\delta \mat{I}_p +
+    \diag{\mat{G}_t}^{1/2}\right) \beta}
+\end{equation} respectively. When $p$ is large, \textsc{AdaFull} may be
+computationally infeasible, yet \textsc{AdaGrad} is unable to capture
+dependencies between coordinates in gradient terms.
+
+\begin{definition}
+    \emph{Effective rank} is defined for a matrix $\mat{\Sigma}$ as 
+    \begin{equation}
+        r(\mat{\Sigma}) = \frac{\tr{\mat{\Sigma}}}{\norm{\mat{\Sigma}}}.
+    \end{equation} $\mat{\Sigma}$ is considered to have \emph{low effective
+    rank} when $r(\mat{\Sigma}) \leq \rank{\mat{\Sigma}} \leq p$.
+\end{definition}
+
+\begin{remark}
+    Low effective rank is a common trademark of high-dimensional data, as there
+    is generally a lot of sparsity.
+\end{remark}
+
+\begin{definition}
+    \emph{Random projections} are low-dimensional embeddings $\mat{\Pi}: \R^p
+    \rightarrow \R^\tau$ which preserve - up to a small distortion - the
+    geometry of a subspace of vectors.
+\end{definition}
+
+\begin{definition}
+    The \emph{Subsampled Randomized Fourier Transform} is a \emph{structured}
+    random projection given by 
+    \begin{equation}
+        \mat{\Pi} = \sqrt{p / \tau}\mat{S} \mat{\Theta} \mat{D}
+    \end{equation} where
+    \begin{enumerate}
+        \item $\mat{S} \in \R^{\tau \times p}$ is a subsampling matrix,
+        \item $\mat{D} \in \R^{p \times p}$ is a diagonal matrix whose entries
+            are drawn independently from $\set{-1, 1}$,
+        \item $\mat{\Theta} \in \R^{p \times p}$ is a unitary discrete fourier
+            transform matrix.
+    \end{enumerate}
+\end{definition}
+
+They propose the following algorithms.
+
+\begin{algorithm}
+    \caption{\textsc{Ada-LR}}
+    \begin{algorithmic}
+        \Require $\eta > 0$, $\delta \geq 0$, $\tau$
+        \For{$t = 1\dots T$}
+            \State Receive $\vec{g}_t = \grad f_t(\beta_t)$
+            \State $\mat{G}_t = \mat{G}_{t - 1} + \vec{g}_t\vec{g}_t^\intercal$ \Comment{Construct additive gram matrix}
+            \State Project $\tilde{\mat{G}_t} = \mat{G}_t\mat{\Pi}$
+            \State $\mat{QR} = \tilde{\mat{G}_t}$ \Comment{QR Decomposition to get the basis vectors $\mat{Q}$ }
+            \State $\mat{B} = \mat{Q}^\intercal \mat{G}_t$ \Comment{Project onto new basis}
+            \State $\mat{U}, \mat{\Sigma}, \mat{V} = \mat{B}$ \Comment{SVD}
+            \State $\beta_{t + 1} = \beta_t - \eta \mat{V}{\left(\mat{\Sigma}^{1/2} + \delta\mat{I}\right)}^{-1}\mat{V}^\intercal\vec{g}_t$
+        \EndFor
+        
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{\textsc{RadaGrad}}
+    \begin{algorithmic}
+        \Require $\eta > 0$, $\delta \geq 0$, $\tau$
+        \For{$t = 1\dots T$}
+            \State Receive $\vec{g}_t = \grad f_t(\beta_t)$
+            \State Project $\tilde{\vec{g}}_t = \mat{\Pi}\vec{g}_t$
+            \State $\tilde{\mat{G}}_t = \tilde{\mat{G}}_{t - 1} + \vec{g}_t\tilde{\vec{g}}_t^\intercal$
+            \State $\mat{Q}_t, \mat{R}_t \leftarrow \texttt{qr\_update}(\mat{Q}_{t - 1}, \mat{R}_{t - 1}, \vec{g}_t, \tilde{\vec{g}}_t)$
+            \State $\mat{B} = \tilde{\mat{G}}_t^\intercal \mat{Q}_t$
+            \State $\mat{U}, \mat{\Sigma}, \mat{W} = \mat{B}$ \Comment{SVD}
+            \State $\mat{V} = \mat{W}\mat{Q}^\intercal$
+            \State $\gamma_t = \eta(\vec{g}_t - \mat{V}\mat{V}^\intercal \vec{g}_t)$
+            \State $\beta_{t + 1} = \beta_t - \eta \mat{V}{\left(\mat{\Sigma}^{1/2} + \delta\mat{I}\right)}^{-1}\mat{V}^\intercal\vec{g}_t - \gamma_t$
+        \EndFor
+    \end{algorithmic}
+\end{algorithm}
 
 
