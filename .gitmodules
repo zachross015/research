@@ -1,0 +1,3 @@
+[submodule "tex-style"]
+	path = tex-style
+	url = https://github.com/zachross015/tex-style
