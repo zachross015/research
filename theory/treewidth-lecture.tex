@@ -1,8 +1,6 @@
 \chapter{\sectioncite{treewidth-lecture}}
 \label{cha:treewidth-lecture}
 
-\TODO{(Read the paper and insert information here.)}
-
 \begin{definition}
     \label{def:treedecomp}
     A \emph{tree decomposition} of a graph $G = (V, E)$ is a pair 
@@ -21,6 +19,9 @@
             subtree of $T$ (all bags involving a vertex $v$ form a connected
             subtree).
     \end{itemize}
+
+    Similarly, a \emph{path decomposition} is a tree decomposition such that $T$
+    is a path (no branches).
 \end{definition}
 
 \begin{remark}
@@ -31,8 +32,68 @@
     \end{itemize}
 \end{remark}
 
-\begin{lemma}
+\begin{lemma} \textnormal{\cite{bodlander}}
     Let $(\set{X_i\ |\ i \in I}, T = (I, M))$ be a tree decomposition of $G =
     (V, E)$, and let $K \subseteq V$ be a clique in $G$. Then $\exists i \in I
     : K \subseteq X_i$.
 \end{lemma}
+
+\begin{definition}
+    The \emph{width} of a decomposition is $\max_{i \in I} \abs{X_i} - 1$. The
+    \emph{tree-width} ($tw(\cdot)$) is the minimum width over all tree
+    decompositions of $G$. Likewise, the \emph{path-width} ($pw(\cdot)$) is the
+    minimum width over all path decompositions of $G$.
+\end{definition}
+
+\begin{corollary}
+    For every graph, $tw(G) \geq \omega(G) - 1$ ($\omega(G)$ is the size of the
+    max clique in $G$).
+\end{corollary}
+
+
+\begin{theorem}
+    The following problems are NP-complete:
+    \begin{itemize}
+        \item Given a graph $G = (V, E)$ and an integer $k < \abs{V}$, is the
+            $tw(G) \leq k$?
+        \item Given a graph $G = (V, E)$ and an integer $k < \abs{V}$, is the
+            $pw(G) \leq k$?
+    \end{itemize}
+\end{theorem}
+
+\begin{definition}
+    The class of $K$-trees is defined recursively as follows:
+    \begin{itemize}
+        \item $K_{k + 1}$ is a $k$-tree;
+        \item a $k$-tree $G$ with $n + 1$ vertices ($n \geq k+1$) can be
+            constructed from a $k$-tree $H$ with $n$ vertices by adding a vertex
+            adjacent to exactly $k$ vertices, namely all vertices of a $(k +
+            1)$-clique of $H$.
+    \end{itemize}
+\end{definition}
+
+\begin{theorem} \textnormal{\cite{ktreechar}}
+    Let $G = (V, E)$ be a graph. The following statements are equivalent:
+    \begin{itemize}
+        \item $G$ is a $k$-tree.
+        \item $G$ is a conneted, $G$ has a $k$-clique, but no $(k + 2)$-cliques,
+            and every minimal separator of $G$ is a $k$-clique.
+        \item $G$ is connected, $\abs{E} = k \abs{V} - \frac{1}{2}k(k + 1)$, and
+            every minimal separator of $G$ is a $k$-clique.
+        \item $G$ has a $k$-clique, but not a $(k + 2)$-clique, and every
+            minimal separator of $G$ is a clique, and for all distinct
+            non-adjacent pairs of vertices $x, y \in V$, there exist exactly $k$
+            vertex disjoint paths from $x$ to $y$.
+    \end{itemize}
+\end{theorem}
+
+\begin{definition}
+    A \emph{partial $k$-tree} is a grpaph that contains all the vertices and a
+    subset of the edges of a $k$-tree.
+\end{definition}
+
+\begin{theorem}
+    \textnormal{\cite{van1990graph}}
+    $G$ is a partial $k$-tree if and only if $G$ has tree-width at most $k$.
+\end{theorem}
+

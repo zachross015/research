@@ -16,26 +16,50 @@
     \end{equation}
 \end{definition}
 \begin{definition}
+    \cite{dwork} The $L_n$ sensitivity of a function $f$ $\left(\text{denoted }
+    \Delta_n(f)\right)$, over any two
+    neighboring databases $D, D'$ $\left(\text{denoted } D \sim D'\right)$ is
+    \begin{equation}
+        \Delta_n(f) = \sup_{D \sim D'}\norm{f(D) - f(D')}_n.
+    \end{equation}
+\end{definition}
+
+\subsection{Mechanisms}%
+\label{sub:mechanisms}
+
+\begin{definition}
+    The \emph{Randomized Response Mechansim} is defined for a predicate $f:
+    \cal{D} \rightarrow \set{0, 1}$ as 
+    \begin{equation}
+        RR_p(f(D)) \defeq 
+        \begin{cases}
+            f(D) & \text{with probability } p, \\
+            1 - f(D) & \text{with probability } 1 - p.
+        \end{cases}
+    \end{equation}
+\end{definition}
+
+\begin{definition}
+    \cite{dwork} The \emph{Laplace Mechanism} with parameter $\epsilon$ is given
+    by 
+    \begin{equation}
+        \cal{L}_\epsilon(f(\vec{X})) \defeq f(\vec{X}) + \left(Y_1, \dots, Y_n\right), 
+    \end{equation}  where each $Y_i \sim \Lambda(0, \Delta_1(f) / \epsilon)$
+    samples from the \emph{Laplace Distribution} which is
+    characterized by the PDF
+    \begin{equation}
+        \Lambda(x | \mu, \sigma) = \frac{1}{2\sigma}\exp\left(- \frac{\abs{x -
+        \mu}}{\sigma}\right).
+    \end{equation}
+\end{definition}
+
+\begin{definition}
     \cite{dwork} The \emph{Gaussian Mechanism} with parameter $\sigma$ is given by
     \begin{equation}
-        \cal{G}_\sigma\left(f\left(\vec{X}\right)\right) = f\left(\vec{X}\right) +
+        \cal{G}_\sigma\left(f\left(\vec{X}\right)\right) \defeq f\left(\vec{X}\right) +
         \cal{N}(0, \sigma^2 \vec{I}).
     \end{equation}
 \end{definition}
-\begin{definition}
-    \cite{dwork} The $L_2$ sensitivity of a function $f$ $\left(\text{denoted }
-    \Delta_f\right)$, over any two
-    neighboring databases $D, D'$ $\left(\text{denoted } D \sim D'\right)$ is
-    \begin{equation}
-        \Delta_f = \sup_{D \sim D'}\norm{f(D) - f(D')}_2.
-    \end{equation}
-\end{definition}
-% \begin{theorem}
-%     \label{thm:dpgauss}
-%     \textnormal{\cite{dwork}} Let $\epsilon \in (0, 1)$ be arbitrary. For $a^2 > 2 \ln(1.25 / \delta)$,
-%     the Gaussian Mechanism with parameter $\sigma \geq a \Delta_f/\epsilon$
-%     is $(\epsilon, \delta)$-differentially private.
-% \end{theorem}
 
 
 \section{R\'enyi Differential Privacy}%
@@ -86,9 +110,45 @@ traditional DP.
     then $f \circ g$ is $(\alpha / 2^c, 3^c \epsilon)$-RDP.
 \end{proposition}
 
-\noindent We want to establish the use of the gaussian mechanism in conjunction with RDP,
-since the gaussian mechanism has the additive property, making it simpler for
-further analysis. To do so, we first make note of the following proposition.
+\subsection*{Randomized Response RDP}%
+\label{sub:mechanism_rdp}
+
+\begin{proposition}
+    The randomized response mechanism with probability $p$ satisfies
+    \begin{equation}
+        \left(\alpha, \frac{1}{\alpha - 1}\log\left(p^\alpha{(1 - p)}^{1 -
+        \alpha} + {(1 - p)}^\alpha p^{1 - \alpha}\right)\right)-\text{RDP}
+    \end{equation} if $\alpha > 1$, and 
+    \begin{equation}
+        \left(\alpha, (2p - 1)\log\left(\frac{p}{1 - p}\right)\right)-\text{RDP}
+    \end{equation} if $a = 1$.
+\end{proposition}
+
+\subsection*{Laplacian RDP}%
+\label{sub:laplacian_rdp}
+
+\begin{proposition}
+    For any $\alpha \geq 1$ and $\lambda > 0$:
+    \begin{equation}
+        D_\alpha(\Lambda(0, \lambda)\ ||\ \Lambda(1, \lambda)) = \frac{1}{\alpha
+        - 1} \log \left\{\frac{\alpha}{2\alpha - 1}\exp\left(\frac{\alpha -
+        1}{\lambda}\right) + \frac{\alpha - 1}{2\alpha - 1}\exp
+        \left(\frac{-\alpha}{\lambda}\right)\right\}.
+    \end{equation}
+\end{proposition}
+
+\begin{corollary}
+    If real-valued function $f$ has sensitivity 1, then the Laplace Mechanism
+    $\cal{L}_\lambda(f)$ satisifies $\left(\alpha, \frac{1}{\alpha
+        - 1} \log \left\{\frac{\alpha}{2\alpha - 1}\exp\left(\frac{\alpha -
+        1}{\lambda}\right) + \frac{\alpha - 1}{2\alpha - 1}\exp
+        \left(\frac{-\alpha}{\lambda}\right)\right\}\right)$-RDP.
+\end{corollary}
+
+
+\subsection*{Gaussian RDP}%
+\label{sub:gaussian_rdp}
+
 
 \begin{proposition}
         $D_\alpha(\cal{N}(0, \sigma^2)\ ||\ \cal{N}(\mu, \sigma^2)) =
@@ -97,7 +157,7 @@ further analysis. To do so, we first make note of the following proposition.
 \begin{corollary} 
     \label{cor:dpgauss}
     The gaussian mechanism $\cal{G}_\sigma$ applied to a function $f$ satisfies $(\alpha, \alpha
-    \Delta_f^2 / (2\sigma^2))$-RDP.
+    {\Delta_2(f)}^2 / (2\sigma^2))$-RDP.
 \end{corollary}
 
 \noindent Finally, we can recover the $\epsilon$ and $\delta$ terms from RDP.

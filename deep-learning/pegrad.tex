@@ -14,15 +14,15 @@ Let each layer of a neural network be defined by the standard transformations
 \end{equation} with the bias assumed to be an extra row/column of $\mat{W}$ and
 loss function $\cal{L}$. Let $\cal{B} \subset \cal{D}$ be a minibatch of the input
 dataset
-$\cal{D}$, and let $\cal{B}^{(j)}$ be the $j$th example in the minibatch with
-$\cal{L}^{(j)}$ corresponding to the loss of $\cal{B}^{(j)}$ and cost function $C =
-\sum_{j=1}^n\cal{L}^{(j)}$.
+$\cal{D}$, and let $\cal{B}^{[j]}$ be the $j$th example in the minibatch with
+$\cal{L}^{[j]}$ corresponding to the loss of $\cal{B}^{[j]}$ and cost function $C =
+\sum_{j=1}^n\cal{L}^{[j]}$.
 The per example gradient norm is computed with respect both to the example and
 the layer, such that the gradient norm for layer $i$ and example $j$ is 
 \begin{equation}
     \label{eq:pegrad}
-    {\left\Vert\dv{\cal{L}^{(j)}}{\mat{W}^{(i)}}\right\Vert}^2 = \sum_{k,l}
-    {\left(\pdv{\cal{L}^{(j)}}{W_{k, l}^{(i)}}\right)}^2,
+    {\left\Vert\dv{\cal{L}^{[j]}}{\mat{W}^{(i)}}\right\Vert}^2 = \sum_{k,l}
+    {\left(\pdv{\cal{L}^{[j]}}{W_{k, l}^{(i)}}\right)}^2,
 \end{equation} which is just the frobenius norm. Note that this equation can be
 used to calculate the $L_2$ norm of the parameter gradient for an example or
 the $L_2$ norm of the gradient for an individual weight matrix by summing over
@@ -30,13 +30,13 @@ $j$ or $i$, respectively.
 
 The proposed method
 makes use of $\mat{H}^{(i)}$ whose $j$th row contains the activation layer
-$\vec{h}^{(i)}$ corresponding to $\cal{B}^{(j)}$ i.e.\ $\mat{H}^{(i)}_j =
-\phi^{(i)}\left(\mat{W}^{(i)}\phi^{(i - 1)}\left(\dots\left( \mat{W}^{(1)}\cal{B}^{(j)}\right)\dots\right)\right)$. Likewise, define
+$\vec{h}^{(i)}$ corresponding to $\cal{B}^{[j]}$ i.e.\ $\mat{H}^{(i)}_j =
+\phi^{(i)}\left(\mat{W}^{(i)}\phi^{(i - 1)}\left(\dots\left( \mat{W}^{(1)}\cal{B}^{[j]}\right)\dots\right)\right)$. Likewise, define
 $\mat{Z}^{(i)}$ for each $\vec{z}^{(i)}$ and compute $\bar{\mat{Z}} =
 \grad_{\mat{Z}} C$, which can be computed in a single pass using standard
 backpropagation. This gives us 
 \begin{equation}
-    {\left\Vert\pdv{\cal{L}^{(j)}}{\mat{W}^{(i)}}\right\Vert}^2 = \left(\sum_k{\left(\bar{Z}_{j,k}^{(i)}\right)}^2\right)
+    {\left\Vert\pdv{\cal{L}^{[j]}}{\mat{W}^{(i)}}\right\Vert}^2 = \left(\sum_k{\left(\bar{Z}_{j,k}^{(i)}\right)}^2\right)
                 \left(\sum_k{\left(H_{j,k}^{(i - 1)}\right)}^2\right) 
                 = {\left\Vert \bar{\vec{Z}}_j^{(i)}\right\Vert}^2{\left\Vert
                 \vec{H}_j^{(i - 1)}\right\Vert}^2.
