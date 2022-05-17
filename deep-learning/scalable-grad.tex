@@ -67,11 +67,14 @@ dependencies between coordinates in gradient terms.
     \end{enumerate}
 \end{definition}
 
-They propose the following algorithms.
+\noindent They conclude by proposing Algorithms \ref{alg:adalr} and
+\ref{alg:radagrad}.
 
-\begin{algorithm}
+
+\begin{algorithm}[h]
     \caption{\textsc{Ada-LR}}
-    \begin{algorithmic}
+    \label{alg:adalr}
+    \begin{algorithmic}[1]
         \Require $\eta > 0$, $\delta \geq 0$, $\tau$
         \For{$t = 1\dots T$}
             \State Receive $\vec{g}_t = \grad f_t(\beta_t)$
@@ -82,13 +85,15 @@ They propose the following algorithms.
             \State $\mat{U}, \mat{\Sigma}, \mat{V} = \mat{B}$ \Comment{SVD}
             \State $\beta_{t + 1} = \beta_t - \eta \mat{V}{\left(\mat{\Sigma}^{1/2} + \delta\mat{I}\right)}^{-1}\mat{V}^\intercal\vec{g}_t$
         \EndFor
-        
     \end{algorithmic}
 \end{algorithm}
 
+\newpage
+
 \begin{algorithm}
     \caption{\textsc{RadaGrad}}
-    \begin{algorithmic}
+    \label{alg:radagrad}
+    \begin{algorithmic}[1]
         \Require $\eta > 0$, $\delta \geq 0$, $\tau$
         \For{$t = 1\dots T$}
             \State Receive $\vec{g}_t = \grad f_t(\beta_t)$

@@ -1,0 +1,77 @@
+\chapter{\sectioncite{mini-block}}
+\label{cha:mini-block}
+
+\begin{definition}
+    The \emph{empirical fisher matrix} $F_{\vec{\theta}}$ of a model's conditional
+    distribution is defined as 
+    \begin{equation}
+        F_{\vec{\theta}} = \bb{E}_{x \sim X, y \sim p_{\vec{\theta}}(\cdot
+         | x)}\left[
+            \pdv{\log p_{\vec\theta}(y|x)}{\vec\theta}
+            {\left(\pdv{\log p_{\vec\theta}(y\ |\ x)}{\vec\theta}\right)}^\intercal
+            \right]
+    \end{equation} where $X$ is a data distribution and $p_{\vec\theta}(\cdot |
+    x)$ is the density function of the conditional distribution defined by the
+    model with a given input $x$.
+\end{definition}
+
+\begin{remark}
+    \cite{martens} has shown that when the conditional distribution is a
+    categorical distribution for classification or Gaussian distribution for
+    regression, then the empirical fisher matrix can be written compactly as 
+    \begin{equation}
+       F_{\vec\theta} = \frac 1 n J_{\vec\theta}^\intercal J_{\vec \theta}
+    \end{equation} where $J_{\vec \theta} \in \R^{n \times p}$ is the Jacobian of the loss
+    function on inputs $x \in X$ with respect to the parameters, i.e. if
+    $\L_{\vec \theta}^{[i]}$ identifies the loss when evaluating $f_{\vec \theta}$
+    on example $x^{[i]}$ of the input and $\L_{\vec \theta} = \L_{\vec
+    \theta}^{[:]}$, then the Jacobian is given by
+    \begin{equation}
+        J_{\vec\theta} = \pdv{\L_{\vec \theta}}{\vec \theta}
+    \end{equation}
+\end{remark}
+
+Since we often express our network a series of linear transformations
+via matrix multiplication, the Jacobian and empirical Fisher matrices of
+matrices should be assumed to be vectorized versions of their matrix
+counterparts, e.g.
+\begin{equation}
+    J_{\mat W^{(l)}} = \pdv{\L_{\vec \theta}}{\text{vec}\left(\mat{W}^{(l)}\right)}.
+\end{equation}
+The paper proposes to approximate the empirical fisher matrix, as the actual one
+is computationally infeasible. This is done via 
+\begin{equation}
+    F_{\vec \theta} \approx \diag{F_{\mat{W}^{(1)}}, \dots, F_{\mat {W}^{(L)}}}.
+\end{equation} The pre-conditioning on the gradient is then done as 
+\begin{equation}
+    \mat{W}_{t + 1}^{(l)} \leftarrow \mat{W}_{t}^{(l)} - \alpha F_{\mat {W}^{(l)}_t}^{-1}
+    \pdv{\L_{\vec\theta}}{\mat{W}^{(l)}_t}
+\end{equation}
+
+
+\section{Preconditioning}%
+\label{sec:preconditioning}
+
+
+\subsection{Fully-Connected, Feed Forward Layers}%
+\label{sub:fully_connected_feed_forward_layers}
+
+For fully-connected, feed forward networks, this is accomplished for each neuron
+by constructing the empirical fisher approximation over a subset of the neurons 
+(i.e.\ subset of the rows) \emph{independently and in parallel} so that if $\mat B$ is any
+subset of the rows of $\mat W^{(l)}$, then the gradient update for this
+\emph{mini-block} $\mat B$ is given by 
+\begin{equation}
+    \label{eq:gradupdate}
+    \mat{B}_{t + 1}^{(l)} \leftarrow \mat{B}_{t}^{(l)} - \alpha F_{\mat {B}^{(l)}_t}^{-1}
+    \pdv{\L_{\vec\theta}}{\mat{B}^{(l)}_t} 
+\end{equation} and if $B_1, \dots, B_n$ form any partition of the rows of $\mat
+W^{(l)}$, then the complete gradient update is performed by computing
+\refeq{gradupdate} for each $B_i$ in parallel and recombining the results in
+their original order.
+
+\subsection{Convolutional Layers}%
+\label{sub:convolutional_layers}
+
+\TODO{Fill this out}
+
