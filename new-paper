@@ -24,7 +24,7 @@ if not os.path.exists(args.category):
     # TODO: Make the header file automatically read from all the other files in
     # the folder rather than inputting them manually via this command line tool
     with open(f'{args.category}/header.tex', 'w+') as f:
-        f.write(f'\\part{{{args.category}}}\n')
+        f.write(f'\\chapter{{{args.category}}}\n')
 
     # Attach the header file to the overarching directory folder
     with open('directories.tex', 'a') as f:
@@ -34,7 +34,7 @@ if not os.path.exists(args.category):
 
 
 with open(f'{args.category}/{args.name}.tex', 'w+') as f:
-    f.write(f'\\chapter{{\\sectioncite{{{args.name}}}}}\n')
+    f.write(f'\\section{{\\sectioncite{{{args.name}}}}}\n')
     f.write(f'\\label{{cha:{args.name}}}\n\n')
     f.write(f'\\TODO{{(Read the paper and insert information here.)}}')
 

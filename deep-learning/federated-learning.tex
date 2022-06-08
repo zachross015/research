@@ -1,4 +1,4 @@
-\chapter{\sectioncite{federated-learning}}
+\section{\sectioncite{federated-learning}}
 \label{sec:federated-learning}
 
 This paper outlines a distributed learning method which operates on the basis
@@ -35,14 +35,14 @@ algorithm) so that its update is given by $\mat{H}_t^i \triangleq \mat{W}_i^t -
     \in S_t} \mat{H}_t^i,
 \end{equation} where $\eta_t$ is the learning rate.
 
-\section{Structured Updates}%
+\subsection{Structured Updates}%
 \label{sec:structured_update}
 
 \emph{Structured updates} send back and forth full-sized models based on a
 predefined structure. By doing so, there is little loss of information over the
 communication channel but potential for higher data throughput.
 
-\subsection{Low Rank}%
+\subsubsection{Low Rank}%
 \label{sub:low_rank}
 
 We enforce each $\mat{H}_t^i \in \R^{d_1 \times d_2}$ to be a low rank matrix of
@@ -53,27 +53,27 @@ as a random matrix defined by a seed and only optimizing $\mat{B}_t^i$, saving a
 factor of $d_1 / k$ parameters in communication. $\mat{A}_t^i$ is generated
 afresh each round and for each client independently.
 
-\subsection{Random Mask}%
+\subsubsection{Random Mask}%
 \label{sub:random_mask}
 
 We restrict each $\mat{H}_t^i$ to be sparse based on a predefined sparsity
 pattern with respect to a random seed (similar to low rank). The sparsity
 pattern is generated afresh each round and for each client independently.
 
-\section{Sketched Updates}%
+\subsection{Sketched Updates}%
 \label{sec:sketched_update}
 
 \emph{Sketched updates} place higher emphasis on communication cost rather than
 fully structured models.
 
-\subsection{Subsampling}%
+\subsubsection{Subsampling}%
 \label{sub:subsampling}
 
 We only communicate a matrix $\hat{\mat{H}}_t^i = \mat{H}_t^i \odot \mat{M}$
 where $\mat{M}$ is a sparse mask and is generated afresh each round and for each
 client independently. This can be done s.t.\ $\E{\hat{\mat{H}}_t} = \mat{H}_t$.
 
-\subsection{Probabilistic Quantization}%
+\subsubsection{Probabilistic Quantization}%
 \label{sub:probabilistic_quantization}
 
 Let $\vec{h} = \left(h_1, \dots, h_{d_1 \times d_2}\right) =

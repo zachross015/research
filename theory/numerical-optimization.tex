@@ -1,8 +1,8 @@
-\chapter{\sectioncite{numerical-optimization}}
+\section{\sectioncite{numerical-optimization}}
 \label{sec:numerical-optimization}
 
 \setcounter{section}{5}
-\section{Quasi-Newton Methods}%
+\subsection{Quasi-Newton Methods}%
 \label{sec:quasi_newton_methods}
 
 In the following section, we have the notation $f_k \defeq f(\vec{x}_k)$ for
@@ -75,6 +75,7 @@ without the hessian information. Given this, we define the following
 so that updates to the inverse
 hessian are given by 
 \begin{equation}
+    \label{eq:hessapprox}
     \tilde{\mat{H}}_{k+1}^{-1} = \left(\mat{I} - \rho_k \vec{s}_k
     \vec{y}_k^\intercal\right) \tilde{\mat{H}}_k^{-1} \left(\mat{I} - \rho_k
     \vec{y}_k\vec{s}_k^\intercal\right) + \rho_k \vec{s}_k \vec{s}_k^\intercal.

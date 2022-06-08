@@ -1,0 +1,76 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CHAPTER: STOCHASTIC OPTIMIZATION % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Stochastic Optimization}%
+\label{cha:stochastic_optimization}
+
+Most stochastic optimization \cite{stoch} problems follow the form 
+\begin{equation}
+    \min_{x \in \R^n} f(x) = \bb{E}_{\xi \sim \Xi}\left[F(x, \xi)\right]
+\end{equation} where $F : \R^n \times \R^d \rightarrow \R$ is continuously
+differentiable. Since $F(\cdot, \xi)$ tends to be unknown, this is empirically
+restated as 
+\begin{equation}
+    \min_{x \in \R^n} f(x) = \frac{1}{N}\sum_{i = 1}^N f_i(x)
+\end{equation} where $f_i: \R^n \rightarrow \R$ is the loss corresponding to the
+$i\th$ sample data, and $N$ denotes the number of sample data and is assumed to
+be extremely large. We define the following, as they are frequently used as
+assumptions:
+\begin{definition}[Lipschitz Continuous]
+    A continuously differentiable function $f : \R^n \rightarrow \R$ is
+    \emph{Globally Lipschitz Continuous} with constant $L$ if for any $x, y \in
+    \R^n$,
+    \begin{equation}
+        \norm{\grad f(x) - \grad f(y)} \leq L \norm{x - y}.
+    \end{equation}
+\end{definition}
+\begin{definition}[Unbiased Estimate]
+    A function $g(\xi)$, where $\xi \sim \Xi$ and $\Xi$ is a random distribution, is
+    called and \emph{unbiased estimate} of $y$ if 
+    \begin{equation}
+        \bb{E}\left[g(\xi)\right] = y.
+    \end{equation}
+\end{definition}
+
+\section{Quasi-Newton Methods}%
+\label{sec:quasi_newton_methods}
+
+These methods generally follow the form of \refalg{sqn}
+\begin{algorithm}
+    \caption{Stochastic Quasi-Newton Method}
+    \label{alg:sqn}
+    \begin{algorithmic}
+        \Require $x_1 \in \R^n$, a PD matrix $H_1 \in \R^{n \times n}$, batch
+        sizes $\set{m_k}_{k \geq 1}$, and stepsizes $\set{\alpha_k}_{k \geq 1}$ 
+        \For{$k = 1, 2, \dots$}
+            \State Calculate $g_k = \frac{1}{m_k}\sum_{i=1}^{m_k} g(x_k, \xi_{k, i})$.
+            \State Generate a PD Hessian inverse approximation $H_k$.
+            \State $x_{k + 1} = x_k - \alpha_k H_k g_k$.
+        \EndFor
+    \end{algorithmic}
+\end{algorithm}
+
+    
+
+\cite{stoch} assumes that $f$ is globally Lipschitz continuous, lower bounded,
+and that for each iteration $k$ we have an unbiased estimate for the gradient
+$\bb{E}[{g(x_k, \xi_k)}] = \grad f(x_k)$. Furthermore, the noise must
+also be upper-bounded, i.e.\
+\begin{equation} 
+    \bb{E}_{y_k}\left[\norm{g(x_k, \xi_k) - \grad f(x_k)}^2\right] \leq \sigma^2.
+\end{equation} Additional constraint is placed on the objective function:
+$F(x, \xi)$ must be twice continuously differentiable w.r.t.\ $x$, the stochastic
+gradient must be computed as $g(x, \xi) = \grad_x F(x, \xi)$, and there must exist a
+positive constant $\kappa$ s.t.\ $\norm{\grad_{xx}^2 F(x, \xi)} \leq \kappa$ for
+any $x, \xi$. This is effectively the same update method as \refeq{hessapprox}
+(along with L-BFGS which I have yet to write about which approximates $\mat{H}^{-1}_k\vec g_k$ at each
+iteration rather than solely $\mat H^{-1}_k$),
+except we use a dampened $\vec y$.
+
+While this method is computationally effective, it is not feasible for storage
+purposes in deep learning algorithms (as is also the case for L-BFGS). The
+algorithm requires maintaining all iterates of $\vec s_k$ and $\vec p_k$ which
+is $\cal{O}(n)$ space. For purposes such as machine learning, $n$ can be in the
+millions. This is laid out in lines 5, 6, 10, and 11 of Procedure 3.1 in their
+paper.
