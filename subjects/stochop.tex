@@ -25,13 +25,14 @@ assumptions:
         \norm{\grad f(x) - \grad f(y)} \leq L \norm{x - y}.
     \end{equation}
 \end{definition}
-\begin{definition}[Unbiased Estimate]
-    A function $g(\xi)$, where $\xi \sim \Xi$ and $\Xi$ is a random distribution, is
-    called and \emph{unbiased estimate} of $y$ if 
-    \begin{equation}
-        \bb{E}\left[g(\xi)\right] = y.
-    \end{equation}
-\end{definition}
+\TODO{Fill out some intuition for Lipschitz Continuity here. Definitely use a figure of sorts.}
+
+\begin{remark}
+    In machine learning, we can view $x$ in the previous definitions as being
+    our set of parameters, $f$ as the objective function, and $f_i$ as the component
+    function for data point $i$ (i.e. $i$ corresponds to the $i\th$ element in
+    the dataset).
+\end{remark}
 
 \section{Quasi-Newton Methods}%
 \label{sec:quasi_newton_methods}
@@ -51,6 +52,89 @@ These methods generally follow the form of \refalg{sqn}
     \end{algorithmic}
 \end{algorithm}
 
+\subsection{BFGS}%
+\label{sub:bfgs}
+
+Let  $f_k \defeq f(\vec{x}_k)$. \cite{numerical-optimization} Outlines the baseline method, BFGS, as follows: 
+
+\begin{definition}[Second Order Taylor Polynomial]
+    For a multivariate function $f: \R^n
+\rightarrow \R$, the \emph{Second Order Taylor Polynomial} is given by 
+\begin{equation}
+    f(\vec{x}) \approx f(\vec{x^*}) + {\grad f(\vec{x^*})}^\intercal(\vec{x} - \vec{x^*}) + \frac{1}{2}
+    {(\vec{x} - \vec{x^*})}^\intercal H_f(\vec{x^*}){(\vec{x} - \vec{x^*})}.
+\end{equation}
+\end{definition}
+
+\begin{definition}[Wolfe Conditions]
+    A step size $\alpha_k$ is said to satisfy the \emph{Wolfe Conditions} if for
+    a multivariate function $f: \R^n \rightarrow \R$ with iterate $\vec{x}_{k + 1} =
+    \vec{x}_k + \alpha_k \vec{p}_k$, we have 
+    \begin{enumerate}
+        \item $f_{k + 1} \leq f_k + c_1 \alpha_k \vec{p}_k^\intercal \grad f_k$, and 
+        \item $-\vec{p}_k \grad f_{k + 1} \leq - c_2
+            \vec{p}_k^\intercal \grad f_k$,
+    \end{enumerate} where $0 < c_1 < c_2 < 1$.
+\end{definition}
+
+This section begins by building off of the second order Taylor Polynomial for
+approximating a function's roots. I will now derive the primary formula used in
+this paper for my own benefit. Consider the quadratic model at iterate
+$\vec{x}_k$
+\begin{equation}
+    f(\vec{x}) \approx f_k + {\grad f_k}^\intercal(\vec{x} - \vec{x}_k) + \frac{1}{2}
+    {(\vec{x} - \vec{x}_k)}^\intercal H_{f_k}{(\vec{x} - \vec{x}_k)}.
+\end{equation} We simplify the notation further by letting $\vec{p} = \vec{x} -
+\vec{x}_k$ and defining the root finding problem using an approximation of the
+hessian $\tilde{\mat{H}_k}$ at iterate $\vec{x}_k$ as 
+\begin{equation}
+    \label{eq:update}
+    m_k(\vec{p}) = f_k + \grad f_k^\intercal\vec{p} +
+    \frac{1}{2}\vec{p}^\intercal \tilde{\mat{H}_k} \vec{p}.
+\end{equation} The approximate hessian is an $n \times n$ symmetric positive
+definite matrix that is updated at each iteration.
+
+The minimizer of \refeq{update} is notably $p_k = -\tilde{H_k}^{-1}\grad f_k$,
+which provides us with the search direction, for which we update the iterate
+using \begin{equation}
+    \label{eq:update2}
+    \vec{x}_{k + 1} = \vec{x_k} + \alpha_k \vec{p}_k
+\end{equation} where $\alpha_k$ satisfies the Wolfe Conditions. If $f$ is
+\emph{strongly convex}, then the \emph{curvature condition}, given by
+\begin{equation}
+    {(\vec{x}_{k + 1} - \vec{x}_k)}^\intercal\left(\grad f_{k + 1} - \grad f_k\right) > 0
+\end{equation} will always hold. Otherwise, we have to force this condition via
+choice of $\alpha_k$ (directly affects \refeq{update2})  since it is a requirement that
+$\tilde{\mat{H}}_{k+1}{(\vec{x}_{k + 1} -
+\vec{x}_k)}^\intercal = \grad f_{k + 1} - \grad{f_k}$ in order
+for the first condition to be met. $\alpha_k$ can be chosen using a line search
+procedure which imposes the Wolfe or Strong Wolfe conditions.
+
+The paper continues to show that, rather than update the approximate hessian at
+each iterate, we need only update the inverse since each iterate is a function
+of the inverse, and each $\grad m_k (\vec{0}) = \grad f_k$ can be evaluated
+without the hessian information. Given this, we define the following
+\begin{equation}
+    \begin{aligned}
+        \vec{s}_k = \vec{x}_{k + 1} - \vec{x}_k = \alpha_k \vec{p}_k, \quad 
+        \vec{y}_k = \grad f_{k + 1} - \grad f_k, \quad \text{and} \quad
+        \rho_k = \frac{1}{\vec{y}_k^\intercal \vec{s}_k}
+    \end{aligned}
+\end{equation}
+so that updates to the inverse
+hessian are given by 
+\begin{equation}
+    \label{eq:hessapprox}
+    \tilde{\mat{H}}_{k+1}^{-1} = \left(\mat{I} - \rho_k \vec{s}_k
+    \vec{y}_k^\intercal\right) \tilde{\mat{H}}_k^{-1} \left(\mat{I} - \rho_k
+    \vec{y}_k\vec{s}_k^\intercal\right) + \rho_k \vec{s}_k \vec{s}_k^\intercal.
+\end{equation}
+
+\subsubsection{L-BFGS}%
+\label{subsub:l_bfgs}
+
+
+\TODO{Read LBFGS and write analysis}
     
 
 \cite{stoch} assumes that $f$ is globally Lipschitz continuous, lower bounded,
@@ -73,4 +157,12 @@ purposes in deep learning algorithms (as is also the case for L-BFGS). The
 algorithm requires maintaining all iterates of $\vec s_k$ and $\vec p_k$ which
 is $\cal{O}(n)$ space. For purposes such as machine learning, $n$ can be in the
 millions. This is laid out in lines 5, 6, 10, and 11 of Procedure 3.1 in their
-paper.
+paper. Even moreso, the article only compares itself to SGD rather than the more
+comparable L-BFGS, and so it is hard to tell if its performance even will outdo
+the method it is built off of.
+
+\cite{batchlbfgs} improves on the L-BFGS method by only maintaining the last $m$
+curvature pairs $(\vec y_k, \vec s_k)$. Results show that this method performs similarly
+to that of the fully L-BFGS method even with an overlap of $25\%$, yet performs
+significantly more gradient evaluations than that of Adam.
+
