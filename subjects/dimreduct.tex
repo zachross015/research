@@ -1,0 +1,78 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CHAPTER: DIMENSIONALITY REDUCTION %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Dimensionality Reduction}%
+\label{cha:dimensionality_reduction}
+
+
+\section{Random Projections}%
+\label{sec:random_projections}
+
+
+\begin{definition}
+    \cite{scalable-opt} \emph{Random projections} are low-dimensional embeddings $\mat{\Pi}: \R^\rho
+    \rightarrow \R^\tau$ which preserve - up to a small distortion - the
+    geometry of a subspace of vectors.
+\end{definition}
+
+For a matrix $\mat A \in \R^{m \times n}$ with $\rank{\mat A} = r$, we consider
+the block SVD for some $1 \leq k \leq r$ given by 
+\begin{equation}
+    \mat A = \bmat{\mat U_k & \mat U_{r - k}}
+    \bmat{\mat \Sigma_k & \\ & \mat \Sigma_{r - k}} 
+    \bmat{\mat V^\intercal_k \\ \mat V^\intercal_{r - k}}
+\end{equation} where the singular values are ordered s.t. $\sigma_1 \geq \cdots
+\geq \sigma_k \geq \sigma_{k + 1} \geq \cdots \geq \sigma_r > 0$. We also denote
+$\mat A_k = \mat U_k \mat \Sigma_k \mat V_k^\intercal$. 
+
+We now define a list of random projections that have been observed in papers. We
+first consider a class of random projections having the following form:
+\begin{equation}
+    \label{eq:rp}
+    \mat{\Pi} = \sqrt{\rho / \tau}\mat{S} \mat{\Theta} \mat{D}
+\end{equation} where 
+\begin{enumerate}
+    \item $\rho$ is the original dimensionality,
+    \item $\tau$ is the reduced dimensionality,
+    \item $\mat{S} \in \R^{\tau \times \rho}$ is a subsampling matrix,
+    \item $\mat \Theta \in \R^{\rho \times \rho}$ is a structured orthonormal transformation, and
+    \item $\mat{D} \in \R^{\rho \times \rho}$ is a diagonal matrix whose entries
+        are drawn independently from $\set{-1, 1}$,
+\end{enumerate}
+
+\begin{definition}
+    \cite{improved-matrix-algorithms-via-the-subsampled-randomized-hadamard-transform}
+    Let $\rho = 2^n$. The \emph{Non-normalized Walsh-Hadamard Transform} is a block matrix of
+    dimensionality $\rho \times \rho$, defined recursively as 
+    \begin{equation}
+        \mat H_2 = \bmat{1 & 1 \\ 1 & -1}, \quad \text{and} \quad 
+        \mat H_{\rho} = \bmat{\mat H_{\rho / 2} & \mat H_{\rho / 2} \\ \mat
+        H_{\rho / 2} & - \mat H_{\rho / 2} }.
+    \end{equation} The normalized variation is defined as $\rho^{-1/2}\mat
+    H_{\rho}$.
+\end{definition}
+
+\begin{definition}
+    The \emph{Subsampled Random Hadamard Transform} (SRHT) is a structured random
+    projection given by \refeq{rp} where $\mat{\Theta} \in \R^{\rho \times \rho}$ is a
+    normalized Walsh-Hadamard Transform.
+\end{definition}
+
+The primary issue with using SRHT is it requires the numbers of parameters to be
+a power of two; however, when this is possible, then $\mat \Pi$ can be
+constructed and $\mat \Pi \vec x$ can be computed in $\cal O(2\rho\lg(\tau +
+1))$ operations
+\cite{fast-dimension-reduction-using-rademacher-series-on-dual-bch-codes}. 
+
+\begin{definition}
+    The \emph{Subsampled Randomized Fourier Transform} (SRFT) is a \emph{structured}
+    random projection given by \refeq{rp} where $\mat{\Theta} \in \R^{\rho \times
+    \rho}$ is a unitary discrete fourier transform matrix.
+\end{definition}
+
+The SRFT alleviates the size constraints of the SRHT. The paper I have been
+reviewing so far
+\cite{improved-matrix-algorithms-via-the-subsampled-randomized-hadamard-transform}
+has only performed an analysis on the matrix multiplication case, so I will need
+to find another on the vector projection case.
