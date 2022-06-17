@@ -1,0 +1,28 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CHAPTER: RANDOM PROJECTIONS %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Random Projections}%
+\label{cha:random_projections}
+
+
+\begin{definition}
+    \emph{Random projections} are low-dimensional embeddings $\mat{\Pi}: \R^p
+    \rightarrow \R^\tau$ which preserve - up to a small distortion - the
+    geometry of a subspace of vectors.
+\end{definition}
+
+\begin{definition}
+    The \emph{Subsampled Randomized Fourier Transform} is a \emph{structured}
+    random projection given by 
+    \begin{equation}
+        \mat{\Pi} = \sqrt{p / \tau}\mat{S} \mat{\Theta} \mat{D}
+    \end{equation} where
+    \begin{enumerate}
+        \item $\mat{S} \in \R^{\tau \times p}$ is a subsampling matrix,
+        \item $\mat{\Theta} \in \R^{p \times p}$ is a unitary discrete fourier
+            transform matrix.
+        \item $\mat{D} \in \R^{p \times p}$ is a diagonal matrix whose entries
+            are drawn independently from $\set{-1, 1}$,
+    \end{enumerate}
+\end{definition}

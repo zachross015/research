@@ -1,0 +1,226 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CHAPTER: JACOBIAN ORTHOGONALIZATION %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Jacobian Orthogonalization in Neural Networks}
+\label{cha:jacobian_orthogonalization in Neural Networks}
+
+\section{Linear Layers} 
+\label{sec:linear_layers}
+We note that for a fully-connected linear layer $\vec
+z = \mat W \vec h$, we just need to require and preserve the orthogonality of
+the weight matrix, since the Jacobian is $\partial \vec z / \partial \vec h =
+\mat W$. The following methods have been employed for this.
+
+\subsection{Householder Reflectors}%
+\label{sub:householder_reflectors}
+
+\cite{stabilizing-gradients}
+define the SVD of a transition matrix $\mat{W} \in \R^{n \times n}$ as
+given by $\mat{W} = \mat{U} \mat{\Sigma} \mat{V}^\intercal$ where $\mat{\Sigma}$ is the diagonal matrix of
+singular values and $\mat{U}, \mat{V} \in \R^{n \times n}$ are orthogonal.
+
+\begin{definition}
+    Given a vector $\vec{u} \in \R^k$, $k \leq n$, the Householder Reflector
+    $\cal{H}_k^n(\vec{u})$ is 
+    \begin{equation}
+        \cal{H}_k^n(\vec{u}) = \begin{cases}
+            \bmat{\mat{I}_{n - k} & \mat{0} \\ \mat{0} & \mat{I}_k -
+            2\frac{\vec{u}\vec{u}^\intercal}{\norm{\vec{u}}^2}}, & \vec{u} \neq
+            \vec{0} \\
+            \mat{I}_n, & \text{otherwise.}
+        \end{cases}
+    \end{equation}
+\end{definition}
+\noindent When $n$ is well-defined, the previous function is shorthanded to
+$\cal{H}_k(\vec{u})$.
+
+Let $\bb{O}(n)$ be the set of $n \times n$ orthogonal matrices. The following maps
+are established as precursors to the primary theorems:
+\begin{equation}
+    \begin{aligned}
+        \cal{M}_k : \R^k \times \cdots \times \R^n &\rightarrow \R^{n \times n}
+        \\
+        \cal{M}_k(\vec{u}_k, \dots, \vec{u}_n) &\mapsto
+        \cal{H}_n(\vec{u}_n)\cdots\cal{H}_k(\vec{u}_k),
+    \end{aligned}
+\end{equation} and 
+
+\begin{equation}
+    \label{eq:specmap}
+    \begin{aligned}
+        \cal{M}_{k_1, k_2} : \R^{k_1} \times \cdots \times \R^n \times \R^{k_2} \times
+        \cdots \times \R^n \times \R^n &\rightarrow \R^{n \times n}
+        \\
+        \cal{M}_{k_1, k_2}(\vec{u}_{k_1}, \dots, \vec{u}_n, \vec{v}_{k_1},
+        \dots, \vec{v}_n, \vec{\sigma}) &\mapsto \\
+        \cal{H}_n(\vec{u}_n)\cdots\cal{H}_{k_1}(\vec{u}_{k_1})\text{diag}(\vec{\sigma})\cal{H}_{k_2}(\vec{v}_{k_2})\cdots\cal{H}_n(\vec{v}_n).
+    \end{aligned}
+\end{equation}
+
+\begin{theorem}
+    $\im{\cal{M}_1}$ is the set of all $n \times n$ orthogonal matrices.
+\end{theorem}
+
+\begin{theorem}
+    $\im{\cal{M}_{1, 1}}$ is the set of all $n \times n$ real matrices. 
+\end{theorem}
+
+\begin{theorem}
+    $\im{\cal{M}_{k_1, k_2}}$ includes the set of all orthogonal $n \times n$
+    matrices if $k_1 + k_2 \leq n + 2$.
+\end{theorem}
+
+These definitions can be extended to the case of $\mat{W} \in \R^{m \times n}$
+by taking 
+\begin{equation}
+    \mat{W} = \mat{U}(\mat{\Sigma}|\mat{0}){(\mat{V}_L|\mat{V}_R)}^\intercal =
+    \mat{U}\mat{\Sigma}{\mat{V}_L}^\intercal,
+\end{equation} where $\mat{U} \in \R^{m \times m}$, $\mat{\Sigma} \in
+\text{diag}(\R^m)$, and $\mat{V}_L \in \R^{n \times m}$. \refeq{specmap} can
+then be extended as 
+\begin{equation}
+    \label{eq:specmap2}
+    \begin{aligned}
+        \cal{M}^{m,n}_{k_1, k_2} : \R^{k_1} \times \cdots \times \R^m \times \R^{k_2} \times
+        \cdots \times \R^n \times \R^{\min(m, n)} &\rightarrow \R^{m \times n}
+        \\
+        \cal{M}^{m,n}_{k_1, k_2}(\vec{u}_{k_1}, \dots, \vec{u}_m, \vec{v}_{k_1},
+        \dots, \vec{v}_n, \sigma) &\mapsto \\
+        \cal{H}^m_m(\vec{u}_m)\cdots\cal{H}^m_{k_1}(\vec{u}_{k_1})\mat{\hat{\Sigma}}\cal{H}^n_{k_2}(\vec{v}_{k_2})\cdots\cal{H}^n_n(\vec{v}_n).
+    \end{aligned}
+\end{equation} where $\mat{\hat{\Sigma}} = (\text{diag}(\vec{\sigma})|\vec{0})$ if $m
+< n$ and ${(\text{diag}(\vec{\sigma})|\vec{0})}^\intercal$ otherwise. This leads
+to the following lemma and consequently theorem:
+\begin{lemma}
+    Given $\set{v_i}_{i = 1}^n$, define $V^{(k)} = \cal{H}_n^n(\vec{v}_n) \cdots
+    \cal{H}_k^n(\vec{v}_k)$ for $k \in [n]$. We have:
+    \begin{equation}
+        V_{*, i}^{(k_1)} = V_{*, i}^{(k_2)}, \forall k_1, k_2 \in [n], i \leq
+        \min(n - k_1, n - k_2).
+    \end{equation}
+\end{lemma}
+\begin{theorem}
+    If $m \leq n$, $\im{\cal{M}_{1, n - m + 1}^{m, n}}$ is the set of all $m
+    \times n$ matrices; else the image of $\im{\cal{M}_{m - n + 1, 1}^{m, n}}$
+    is the set of all $m \times n$ matrices.
+\end{theorem}
+
+
+\subsection{Orthogonality Regularization}
+\label{sub:orthogonality_regularization}
+
+\cite{low-rank} uses an orthogonality regularizer, which is done by maintaining
+each weight matrix's SVD $\mat W = \mat U \mat \Sigma \mat V^\intercal$, and
+enforcing a regularizer as part of the objective function, given by 
+\begin{equation}
+    \label{eq:orthloss}
+    L_o(\mat{U}, \mat{V}) = \frac{1}{r^2}\left(\norm{\mat{U}^\intercal\mat{U} -
+    \mat{I}}_F^2 + \norm{\mat{V}^\intercal\mat{V} -
+    \mat{I}}_F^2\right).
+\end{equation} Using this method, $\mat W$ will maintain an approximate
+orthogonality so long as we have all singular values $\sigma_i(\mat \Sigma)
+\in \set{-1, 1}$
+
+
+\subsection{Cayley Transform}%
+\label{sub:cayley_transform}
+
+
+The \emph{Cayley Transform}, used in \cite{cayley, constructin}, make use of
+skew symmetric matrices, i.e.\ matrices s.t. $\mat A = -\mat A^\intercal$, to
+construct their orthogonal convolutions since a skew symmetric matrix can be
+constructed for any matrix $\mat B$ using the formula $\mat A = \mat B - \mat
+B^\intercal$. From this, an orthogonal matrix is explicitly constructed via
+$\mat Q = (\mat I - \mat A){(\mat I + \mat A)}^{-1}$.
+
+
+\section{Convolutional Layers} 
+\label{sec:convolutional_layers}
+
+In this section, we consider the case of convolutional filters having an
+orthogonal Jacobian. A simple way of viewing this comes from that fact that for
+any convolutional filter $\tensor C$, the convolution operation $\tensor Y =
+\tensor C \star \tensor X$ is a linear transformation, and thus there exists
+some $\mat W_{\tensor C}$ such that 
+\begin{equation}
+    \tensor Y = \tensor C \star \tensor X \Leftrightarrow \vrize{\tensor Y} = \mat
+    W_{\tensor C} \vrize{\tensor X}.
+\end{equation}
+We then say that $\tensor C$ is orthogonal if there exists an orthogonal $\mat
+W_{\tensor C}$.
+
+
+\subsection{Explicit Convolution Construction}%
+\label{sub:explicit_convolution_construction}
+
+
+Using the fact that $\tensor C$ is equivalent to some $\mat W_{\tensor C}$, we
+can explicitly construct $\mat W_{\tensor C}$ as orthogonal so that by
+definition, $\tensor C$ has an orthogonal Jacobian. We may then perform the
+transformation via matrix-vector multiplication on $\vrize{\tensor X}$ and
+reshape the resultant vector $\vrize{\tensor Y}$ to be that of the desired
+output. Using this, the methods employed in Section~\ref{sec:linear_layers} are
+viable; however, they are often computationally infeasible due to the size of
+convolution filters.
+
+
+\subsection{Circularly Padded Convolutions}%
+\label{sub:circularly_padded_convolutions}
+
+
+The circular convolution ${\tensor C}$ has the notable property that its
+Jacobian is circulant, and that the matrix form of this convolution $\mat
+W_{\tensor C}$ is a circulant matrix.~\cite{BCOP, cayley, SOC} all require
+circularly padded convolutions, as \cite[Appendix D.2]{SOC} has proved the
+alternative zero-padded orthogonal convolutions must be of size 1.  
+
+
+\cite{cayley} lay out their framework using the \emph{2D convolution theorem}
+\cite{jain} and the \emph{circular convolution-multiplication property}
+\cite{invertible}, given in their analysis by 
+\begin{equation}
+    {(\tensor W \star \tensor X)}_{:, i, j} = \ifft\left(\fft{\left(\mat
+    W\right)}_{:, :, i, j} \fft{\left(\vec x\right)}_{:, i, j}\right).
+\end{equation} 
+Since the convolution in the Fourier domain is just the element-wise product,
+they can efficiently enforce each $\fft{\left(\mat W\right)}_{:,:,i,j}$ as being
+orthogonal via the Cayley transform method highlighted in Subsection
+\ref{sub:cayley_transform}. This allows them to perform the calculation much
+more efficiently than if they explicitly constructed the corresponding weight
+matrix $\mat W_{\tensor C}$. Since inverse convolutions are necessary for this
+method, natural strided convolutions are incompatible and so invertible
+downsampling is necessary to emulate striding. Additionally, the
+parameterization is unable to obtain orthogonal convolutions with -1
+eigenvalues, so the whole space of orthogonal convolutions is not represented.
+
+\cite{SOC} makes use of a modification on skew symmetric matrices (defined in
+Subsection \ref{sub:cayley_transform}), which for any convolution filter
+$\tensor C$ can be constructed by $\tensor M = \tensor C -
+\texttt{conv\_transpose}(\tensor C)$.  from their, they build their orthogonal
+Jacobian off of the \emph{convolutional exponential} \cite{convexp} which is
+defined for a skew-symmetric convolutional filter $\tensor{L} \in \R^{m \times m
+\times k \times k}$ and input $\tensor{X} \in \R^{m \times n \times n}$ as 
+\begin{equation}
+    \tensor{L} \star_e \tensor{X} = \tensor{X} + \sum_{i = 1}^\infty
+    \frac{\tensor{L} \star^i \tensor{X}}{i!}
+\end{equation} where it's assumed $m = \cin = \cout$. When $\cin \neq \cout$,
+other cases are considered. By construction, the Jacobian of the loss with
+respect to this operation satisfies $\exp\left(\mat{J}\right) \vrize{\tensor X}
+= \vrize{\tensor L \star_e \tensor X}$ where $\tensor L$ is skew symmetric which
+they use to show that $\mat J$ (the Jacobian of $\tensor L \star
+\tensor X$)  is skew symmetric, and therefore $\exp\left(\mat{J}\right)$ is
+orthogonal. 
+The paper approximates $\exp(\mat J)$ by taking the first $k$ terms,
+denoted $\mat S_k(\mat J)$ which yields an approximation with error
+$\norm{\exp(\mat J) - \mat S_k(\mat J)} \leq {\norm{\mat J}^k_2}/{k!}$
+\cite[Theorem 3]{SOC}.
+
+While this provides a SOA method for explicitly constructing
+orthogonal matrices from Skew Symmetric ones, and outperforms the methods
+defined in BCOP \cite{BCOP}, its evaluation time suffers due to the repeated
+application of the convolution filter to approximate the orthogonal matrix.
+However, this method forms the basis for that of \cite{constructin}, which
+either uses either \cite{cayley} or \cite{SOC} to construct each kernel as
+orthogonal , and conducting a dilated convolution using the recovered kernels to
+get the orthogonal convolution. 
