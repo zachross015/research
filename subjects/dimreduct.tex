@@ -11,64 +11,118 @@
 
 
 \begin{definition}
-    \cite{scalable-opt} \emph{Random projections} are low-dimensional embeddings $\mat{\Pi}: \R^\rho
-    \rightarrow \R^\tau$ which preserve - up to a small distortion - the
+    \cite{scalable-opt} \emph{Random projections} are low-dimensional embeddings
+    $\mat{\Pi}: \R^n
+    \rightarrow \R^k$ which preserve - up to a small distortion - the
     geometry of a subspace of vectors.
 \end{definition}
 
 For a matrix $\mat A \in \R^{m \times n}$ with $\rank{\mat A} = r$, we consider
-the block SVD for some $1 \leq k \leq r$ given by 
+the block SVD for some $1 \leq s \leq r$ given by 
 \begin{equation}
-    \mat A = \bmat{\mat U_k & \mat U_{r - k}}
-    \bmat{\mat \Sigma_k & \\ & \mat \Sigma_{r - k}} 
-    \bmat{\mat V^\intercal_k \\ \mat V^\intercal_{r - k}}
+    \mat A = \bmat{\mat U_s & \mat U_{r - s}}
+    \bmat{\mat \Sigma_s & \\ & \mat \Sigma_{r - s}} 
+    \bmat{\mat V^\intercal_s \\ \mat V^\intercal_{r - s}}
 \end{equation} where the singular values are ordered s.t. $\sigma_1 \geq \cdots
-\geq \sigma_k \geq \sigma_{k + 1} \geq \cdots \geq \sigma_r > 0$. We also denote
-$\mat A_k = \mat U_k \mat \Sigma_k \mat V_k^\intercal$. 
+\geq \sigma_s \geq \sigma_{s + 1} \geq \cdots \geq \sigma_r > 0$. We also denote
+$\mat A_s = \mat U_s \mat \Sigma_s \mat V_s^\intercal$. Furthermore, let $k \leq
+n$, let $l = \min\set{m, k}$ and let $\mat Q \mat R = \mat A \mat \Pi^\intercal $ be the QR
+decomposition of this projection s.t.\ $\mat Q \in \R^{m \times l}$ and $\mat
+Q^\intercal \mat Q = \mat I_l$. Note that the column space of $\mat A \mat
+\Pi^\intercal$ is contained in the range of $\mat Q$. Let 
+\begin{equation}
+    \mat X_\text{opt} = \argmin_{\rank{\mat X} \leq s} \norm{\mat Q^\intercal
+    \mat A - \mat X}_F,
+\end{equation} and let $\tilde{\mat A}_s = \mat Q^\intercal \mat X_\text{opt}$.
+
+\begin{remark}
+    In the previous definitions given from
+    \cite{improved-matrix-algorithms-via-the-subsampled-randomized-hadamard-transform},
+    the parameters $s$ and $k$ are used without given much definition. For my
+    own intuition, I believe $s$ to be the \emph{rank-reduction} while $k$ is
+    the \emph{dimensionality-reduction}. The parameters respectfully represent
+    how low the rank should be in the final matrix and how low the
+    dimensionality of the matrix should be. Furthermore, $\mat A_s$ minimizes
+    $\norm{\mat A - \mat X}$ for any $\rank{\mat X} \leq s$ while $\tilde{\mat
+    A}_s$ minimizes the projection in to the low-dimensional embedding. Note
+    that the search space for $\mat X$ in the high-dimensional embedding is
+    $\R^{m \times n}$ whereas the search space for $\mat X_\text{opt}$ in the
+    low-dimensional embedding is $\R^{k \times n}$.
+\end{remark}
 
 We now define a list of random projections that have been observed in papers. We
 first consider a class of random projections having the following form:
 \begin{equation}
     \label{eq:rp}
-    \mat{\Pi} = \sqrt{\rho / \tau}\mat{S} \mat{\Theta} \mat{D}
+    \mat{\Pi} = \sqrt{n / k}\mat{S} \mat{\Theta} \mat{D}
 \end{equation} where 
 \begin{enumerate}
-    \item $\rho$ is the original dimensionality,
-    \item $\tau$ is the reduced dimensionality,
-    \item $\mat{S} \in \R^{\tau \times \rho}$ is a subsampling matrix,
-    \item $\mat \Theta \in \R^{\rho \times \rho}$ is a structured orthonormal transformation, and
-    \item $\mat{D} \in \R^{\rho \times \rho}$ is a diagonal matrix whose entries
+    \item $n$ is the original dimensionality,
+    \item $k$ is the reduced dimensionality,
+    \item $\mat{S} \in \R^{k \times n}$ is a subsampling matrix,
+    \item $\mat \Theta \in \R^{n \times n}$ is a structured orthonormal transformation, and
+    \item $\mat{D} \in \R^{n \times n}$ is a diagonal matrix whose entries
         are drawn independently from $\set{-1, 1}$,
 \end{enumerate}
 
 \begin{definition}
     \cite{improved-matrix-algorithms-via-the-subsampled-randomized-hadamard-transform}
-    Let $\rho = 2^n$. The \emph{Non-normalized Walsh-Hadamard Transform} is a block matrix of
-    dimensionality $\rho \times \rho$, defined recursively as 
+    Let $n = 2^n$. The \emph{Non-normalized Walsh-Hadamard Transform} is a block matrix of
+    dimensionality $n \times n$, defined recursively as 
     \begin{equation}
         \mat H_2 = \bmat{1 & 1 \\ 1 & -1}, \quad \text{and} \quad 
-        \mat H_{\rho} = \bmat{\mat H_{\rho / 2} & \mat H_{\rho / 2} \\ \mat
-        H_{\rho / 2} & - \mat H_{\rho / 2} }.
-    \end{equation} The normalized variation is defined as $\rho^{-1/2}\mat
-    H_{\rho}$.
+        \mat H_{n} = \bmat{\mat H_{n / 2} & \mat H_{n / 2} \\ \mat
+        H_{n / 2} & - \mat H_{n / 2} }.
+    \end{equation} The normalized variation is defined as $n^{-1/2}\mat
+    H_{n}$.
 \end{definition}
 
 \begin{definition}
     The \emph{Subsampled Random Hadamard Transform} (SRHT) is a structured random
-    projection given by \refeq{rp} where $\mat{\Theta} \in \R^{\rho \times \rho}$ is a
+    projection given by \refeq{rp} where $\mat{\Theta} \in \R^{n \times n}$ is a
     normalized Walsh-Hadamard Transform.
 \end{definition}
 
 The primary issue with using SRHT is it requires the numbers of parameters to be
 a power of two; however, when this is possible, then $\mat \Pi$ can be
-constructed and $\mat \Pi \vec x$ can be computed in $\cal O(2\rho\lg(\tau +
+constructed and $\mat \Pi \vec x$ can be computed in $\cal O(2n\lg(k +
 1))$ operations
 \cite{fast-dimension-reduction-using-rademacher-series-on-dual-bch-codes}. 
+\cite{improved-matrix-algorithms-via-the-subsampled-randomized-hadamard-transform}
+results in the following theorem for SRHT:
+\begin{theorem}
+    Fix a rank-reduction $2 \leq s < r$. Let $0 < \epsilon < 1/3$ be an accuracy
+    parameter, $0 < \delta < 1$ be a failure probability, and $C \geq 1$ be any
+    specified constant. Let $\mat \Pi \in \R^{k \times n}$ be an SRHT with $k$
+    satisfying 
+    \begin{equation}
+        6C^2 \epsilon^{-1}{\left[\sqrt s + \sqrt{8\ln(n/\delta)}\right]}^2
+        \ln(s/\delta) \leq k \leq n.
+    \end{equation}
+    With probability at least $1 - \delta^{C^2 \ln(s/\delta)/4}-7\delta$, the
+    following Frobenius norm bounds hold simultaneously:
+    \begin{align}
+        \label{eq:}
+        \norm{\mat A - \mat Y \mat Y^{-1} \mat A}_F &\leq (1 + 22\epsilon) \norm{\mat A - \mat A_k}_F,\\
+        \norm{\mat A - \tilde{\mat A}_k}_F &\leq (1 + 22\epsilon) \norm{\mat A - \mat A_k}_F,\\
+        \norm{\mat A_k - \mat Y \mat Y^{-1} \mat A}_F &\leq (1 + 22\epsilon) \norm{\mat A - \mat A_k}_F,\\
+        \norm{\mat A_k - \tilde{\mat A}_k}_F &\leq (2 + 22\epsilon) \norm{\mat A
+        - \mat A_k}_F.
+    \end{align}
+    Similarly, the same setup ensures that with probability at least $1 - 5
+    \delta$, the following spectral norm bounds hold simultaneously:
+    \begin{align}
+        \norm{\mat A - \mat Y \mat Y^{-1} \mat A}_F &\leq \left(4 + \sqrt{\frac{3 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{3 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F\\ 
+        \norm{\mat A - \tilde{\mat A}_k}_F &\leq \left(6 + \sqrt{\frac{6 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{6 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F\\ 
+        \norm{\mat A_k - \mat Y \mat Y^{-1} \mat A}_F &\leq \left(4 + \sqrt{\frac{3 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{3 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F\\ 
+        \norm{\mat A_k - \tilde{\mat A}_k}_F &\leq \left(7 + \sqrt{\frac{12 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{6 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F
+    \end{align}
+\end{theorem}
 
 \begin{definition}
     The \emph{Subsampled Randomized Fourier Transform} (SRFT) is a \emph{structured}
-    random projection given by \refeq{rp} where $\mat{\Theta} \in \R^{\rho \times
-    \rho}$ is a unitary discrete fourier transform matrix.
+    random projection given by \refeq{rp} where $\mat{\Theta} \in \R^{n \times
+    n}$ is a unitary discrete fourier transform matrix
 \end{definition}
 
 The SRFT alleviates the size constraints of the SRHT. The paper I have been
