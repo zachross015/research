@@ -36,6 +36,7 @@ Q$. Let
     \mat X_\text{opt} = \argmin_{\rank{\mat X} \leq s} \norm{\mat Q^\intercal
     \mat A - \mat X}_F,
 \end{equation} and let $\tilde{\mat A}_s = \mat Q^\intercal \mat X_\text{opt}$.
+Let $\mat Y^\mppi$ denote the Moore-Penrose pseudo-inverse.
 
 \begin{remark}
     In the previous definitions given from
@@ -117,24 +118,24 @@ results in the following theorem for SRHT:
     following Frobenius norm bounds hold simultaneously:
     \begin{align}
         \label{eq:}
-        \norm{\mat A - \mat Y \mat Y^{-1} \mat A}_F &\leq (1 + 22\epsilon) \norm{\mat A - \mat A_k}_F,\\
+        \norm{\mat A - \mat Y \mat Y^\mppi \mat A}_F &\leq (1 + 22\epsilon) \norm{\mat A - \mat A_k}_F,\\
         \norm{\mat A - \tilde{\mat A}_k}_F &\leq (1 + 22\epsilon) \norm{\mat A - \mat A_k}_F,\\
-        \norm{\mat A_k - \mat Y \mat Y^{-1} \mat A}_F &\leq (1 + 22\epsilon) \norm{\mat A - \mat A_k}_F,\\
+        \norm{\mat A_k - \mat Y \mat Y^\mppi \mat A}_F &\leq (1 + 22\epsilon) \norm{\mat A - \mat A_k}_F,\\
         \norm{\mat A_k - \tilde{\mat A}_k}_F &\leq (2 + 22\epsilon) \norm{\mat A
         - \mat A_k}_F.
     \end{align}
     Similarly, the same setup ensures that with probability at least $1 - 5
     \delta$, the following spectral norm bounds hold simultaneously:
     \begin{align}
-        \norm{\mat A - \mat Y \mat Y^{-1} \mat A}_F &\leq \left(4 + \sqrt{\frac{3 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{3 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F\\ 
+        \norm{\mat A - \mat Y \mat Y^\mppi \mat A}_F &\leq \left(4 + \sqrt{\frac{3 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{3 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F\\ 
         \norm{\mat A - \tilde{\mat A}_k}_F &\leq \left(6 + \sqrt{\frac{6 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{6 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F\\ 
-        \norm{\mat A_k - \mat Y \mat Y^{-1} \mat A}_F &\leq \left(4 + \sqrt{\frac{3 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{3 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F\\ 
+        \norm{\mat A_k - \mat Y \mat Y^\mppi \mat A}_F &\leq \left(4 + \sqrt{\frac{3 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{3 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F\\ 
         \norm{\mat A_k - \tilde{\mat A}_k}_F &\leq \left(7 + \sqrt{\frac{12 \ln
         (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} +
         \sqrt{\frac{6 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F.
     \end{align}
     Finally, $\mat Y$ can be constructed in $\cal{O}(2mn\lg(k + 1))$, $\mat Y
-    \mat Y^{-1} \mat A$ can be constructed in $\cal{O}(mnl + mkl)$, and
+    \mat Y^\mppi \mat A$ can be constructed in $\cal{O}(mnl + mkl)$, and
     $\tilde{\mat A}_s$ can be constructed in $\cal{O}(mnl + l^2 n)$.
 \end{theorem}
 
