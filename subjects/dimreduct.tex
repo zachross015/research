@@ -5,6 +5,23 @@
 \chapter{Dimensionality Reduction}%
 \label{cha:dimensionality_reduction}
 
+\TODO{Read
+https://www.science.org/doi/full/10.1126/science.290.5500.2319?casa_token=whDQpzuoiBkAAAAA%3AYzbhWSgYlY6xTx399b0zDK7OLnSRkdrdKcp8024KOfx-nETbTfJXHeM80U06Phop5o5K7eSPI2Jm0g}
+
+We now give an overview of dimensionality reduction (DR) in machine learning
+scenarios. Classical, linear methods are outlined in Sections
+\ref{sec:random_projections} and \ref{sec:principle_component_analysis}.
+\cite{dimensionality-reduction-a-comparative}
+highlights that linear methods often cannot handle complex, nonlinear data, and
+provides the taxonomy in \reffig{drtaxonomy} for help in discovery of proper DR
+methods. 
+
+\begin{figure}
+    \includegraphics[\width=\linewidth]{resources/drtaxonomy.png}
+    \label{fig:drtaxonomy}
+    \caption{Taxonomy of DR techniques}
+\end{figure}
+
 
 \section{Random Projections}%
 \label{sec:random_projections}
@@ -16,6 +33,21 @@
     \rightarrow \R^k$ which preserve - up to a small distortion - the
     geometry of a subspace of vectors.
 \end{definition}
+
+These methods work as follows:
+\paragraph{Random Projection Algorithm}
+\begin{enumerate}
+    \item Start with a matrix $\mat A \in \R^{m \times n}$ and a low-dimensional
+        embedding $\mat \Pi \in \R^{k \times n}$. 
+    \item Project the matrix into the low-dimensional embedding $\mat Y = \mat A
+        \mat \Pi^\intercal$. 
+    \item Find an orthonormal basis $\mat Q$ that captures the column space of
+        $\mat Y$, i.e. some matrix which captures the information of the
+        projection. 
+    \item Find the closest point to $\mat A$ under this change of basis, i.e.
+        some matrix $\mat X$ which minimizes $\norm{\mat Q^\intercal \mat A -
+        \mat X}_F$ while having a low rank.
+\end{enumerate}
 
 For a matrix $\mat A \in \R^{m \times n}$ with $\rank{\mat A} = r$, we consider
 the block SVD for some $1 \leq s \leq r$ given by 
@@ -170,3 +202,21 @@ for any $\alpha, \beta > 1$, if
     V}_s^\intercal} \leq 2 (\sqrt{2 \alpha - 1} + 1) (\sqrt{\alpha \omega + 1} +
     \sqrt{\alpha \omega}) \norm{\mat A - \mat A_k}
 \end{equation}
+
+
+\section{Principle Component Analysis}
+
+\section{Comparisons}
+
+\cite{experiments-with-random-projections-for-machine-learning} states that PCA
+often has a higher computational complexity, but tends to outperform RP. RP
+benefits from having a lower computational complexity as well as maintaining
+distance-preserving properties.
+
+\cite{experiments-with-random-projections-for-machine-learning} tests both PCA
+and RP on decision tress, nearest neighbor methods, and SVM on two-class
+classification problems using a projection built s.t. $r_{i, j} \sim \cal{R}$
+where $\cal{R}$ is the Rademacher distribution. Their results show that both
+algorithms can nearly match the performance of the original algorithm for
+nearest neighbor problems, but RP underperforms PCA on almost all accounts for
+the other two problems.
