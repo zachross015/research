@@ -25,11 +25,13 @@ the block SVD for some $1 \leq s \leq r$ given by
     \bmat{\mat V^\intercal_s \\ \mat V^\intercal_{r - s}}
 \end{equation} where the singular values are ordered s.t. $\sigma_1 \geq \cdots
 \geq \sigma_s \geq \sigma_{s + 1} \geq \cdots \geq \sigma_r > 0$. We also denote
-$\mat A_s = \mat U_s \mat \Sigma_s \mat V_s^\intercal$. Furthermore, let $k \leq
-n$, let $l = \min\set{m, k}$ and let $\mat Q \mat R = \mat A \mat \Pi^\intercal $ be the QR
-decomposition of this projection s.t.\ $\mat Q \in \R^{m \times l}$ and $\mat
-Q^\intercal \mat Q = \mat I_l$. Note that the column space of $\mat A \mat
-\Pi^\intercal$ is contained in the range of $\mat Q$. Let 
+$\mat A_s = \mat U_s \mat \Sigma_s \mat V_s^\intercal$ and $\mat Y = \mat A \mat
+\Pi^\intercal$. Furthermore, let $k \leq
+n$, let $l = \min\set{m, k}$ and let $\mat Q \mat R = \mat Y$ be the QR
+factorization (computable in $\cal{O}(ml^2)$) of this projection s.t.\ $\mat Q
+\in \R^{m \times l}$ and $\mat Q^\intercal \mat Q = \mat I_l$.  Note that the
+column space of $\mat Y$ is contained in the range of $\mat
+Q$. Let 
 \begin{equation}
     \mat X_\text{opt} = \argmin_{\rank{\mat X} \leq s} \norm{\mat Q^\intercal
     \mat A - \mat X}_F,
@@ -44,11 +46,18 @@ Q^\intercal \mat Q = \mat I_l$. Note that the column space of $\mat A \mat
     how low the rank should be in the final matrix and how low the
     dimensionality of the matrix should be. Furthermore, $\mat A_s$ minimizes
     $\norm{\mat A - \mat X}$ for any $\rank{\mat X} \leq s$ while $\tilde{\mat
-    A}_s$ minimizes the projection in to the low-dimensional embedding. Note
+    A}_s$ minimizes the projection in to the low-dimensional embedding
+    $\norm{\mat Q^\intercal \mat A - \mat X}$. Note
     that the search space for $\mat X$ in the high-dimensional embedding is
     $\R^{m \times n}$ whereas the search space for $\mat X_\text{opt}$ in the
     low-dimensional embedding is $\R^{k \times n}$.
 \end{remark}
+
+
+\subsection{Subsampled Randomized Projections}%
+\label{sub:subsample_projections}
+
+
 
 We now define a list of random projections that have been observed in papers. We
 first consider a class of random projections having the following form:
@@ -65,9 +74,14 @@ first consider a class of random projections having the following form:
         are drawn independently from $\set{-1, 1}$,
 \end{enumerate}
 
+
+\subsubsection{Subsampled Random Hadamard Transform}%
+\label{sub:subsampled_random_hadamard_transform}
+
+
 \begin{definition}
     \cite{improved-matrix-algorithms-via-the-subsampled-randomized-hadamard-transform}
-    Let $n = 2^n$. The \emph{Non-normalized Walsh-Hadamard Transform} is a block matrix of
+    Let $n = 2^p$ for some $p \in \Z^+$. The \emph{Non-normalized Walsh-Hadamard Transform} is a block matrix of
     dimensionality $n \times n$, defined recursively as 
     \begin{equation}
         \mat H_2 = \bmat{1 & 1 \\ 1 & -1}, \quad \text{and} \quad 
@@ -78,7 +92,7 @@ first consider a class of random projections having the following form:
 \end{definition}
 
 \begin{definition}
-    The \emph{Subsampled Random Hadamard Transform} (SRHT) is a structured random
+    The \emph{Subsampled Randomized Hadamard Transform} (SRHT) is a structured random
     projection given by \refeq{rp} where $\mat{\Theta} \in \R^{n \times n}$ is a
     normalized Walsh-Hadamard Transform.
 \end{definition}
@@ -87,7 +101,7 @@ The primary issue with using SRHT is it requires the numbers of parameters to be
 a power of two; however, when this is possible, then $\mat \Pi$ can be
 constructed and $\mat \Pi \vec x$ can be computed in $\cal O(2n\lg(k +
 1))$ operations
-\cite{fast-dimension-reduction-using-rademacher-series-on-dual-bch-codes}. 
+\cite[Fast Matrix-Vector Multiplication, Theorem 2.1]{fast-dimension-reduction-using-rademacher-series-on-dual-bch-codes}. 
 \cite{improved-matrix-algorithms-via-the-subsampled-randomized-hadamard-transform}
 results in the following theorem for SRHT:
 \begin{theorem}
@@ -115,9 +129,20 @@ results in the following theorem for SRHT:
         \norm{\mat A - \mat Y \mat Y^{-1} \mat A}_F &\leq \left(4 + \sqrt{\frac{3 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{3 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F\\ 
         \norm{\mat A - \tilde{\mat A}_k}_F &\leq \left(6 + \sqrt{\frac{6 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{6 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F\\ 
         \norm{\mat A_k - \mat Y \mat Y^{-1} \mat A}_F &\leq \left(4 + \sqrt{\frac{3 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{3 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F\\ 
-        \norm{\mat A_k - \tilde{\mat A}_k}_F &\leq \left(7 + \sqrt{\frac{12 \ln (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} + \sqrt{\frac{6 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F
+        \norm{\mat A_k - \tilde{\mat A}_k}_F &\leq \left(7 + \sqrt{\frac{12 \ln
+        (n / \delta) \ln(r / \delta)}{k}}\right) \norm{\mat A - \mat A_k} +
+        \sqrt{\frac{6 \ln(r / \delta)}{k}} \norm{\mat A - \mat A_k}_F.
     \end{align}
+    Finally, $\mat Y$ can be constructed in $\cal{O}(2mn\lg(k + 1))$, $\mat Y
+    \mat Y^{-1} \mat A$ can be constructed in $\cal{O}(mnl + mkl)$, and
+    $\tilde{\mat A}_s$ can be constructed in $\cal{O}(mnl + l^2 n)$.
 \end{theorem}
+
+
+\subsubsection{Subsampled Randomized Fourier Transform}%
+\label{sub:subsampled_randomized_fourier_transform}
+
+
 
 \begin{definition}
     The \emph{Subsampled Randomized Fourier Transform} (SRFT) is a \emph{structured}
@@ -129,4 +154,18 @@ The SRFT alleviates the size constraints of the SRHT. The paper I have been
 reviewing so far
 \cite{improved-matrix-algorithms-via-the-subsampled-randomized-hadamard-transform}
 has only performed an analysis on the matrix multiplication case, so I will need
-to find another on the vector projection case.
+to find another on the vector projection case; however, they provide that for an
+SRFT $\mat \Pi$, $\mat Y = \mat A \mat \Pi^\intercal$ is computable in
+$\cal{O}(mn\ln k)$, while the projected SVD, given by $\tilde{\mat
+U}_s\tilde{\mat \Sigma}_s\tilde{\mat V}_s^\intercal$ can be computed
+determinstically from $\mat Y$ in $\cal{O}(s^2(m + n) + sk^2\ln k)$.
+Let $\omega = \max\set{m, n}$. \cite{a-fast-randomized-algorithm-for-approximation-of-matrices} provides that
+for any $\alpha, \beta > 1$, if 
+\begin{equation}
+    k \geq \frac{\alpha^2 \beta}{\alpha - 1} {(2s)}^2
+\end{equation} then with probability at least $1 - 3 / \beta$,
+\begin{equation}
+    \norm{\mat A - \tilde{\mat U}_s\tilde{\mat \Sigma}_s\tilde{\mat
+    V}_s^\intercal} \leq 2 (\sqrt{2 \alpha - 1} + 1) (\sqrt{\alpha \omega + 1} +
+    \sqrt{\alpha \omega}) \norm{\mat A - \mat A_k}
+\end{equation}
