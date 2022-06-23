@@ -6,21 +6,16 @@
 \label{cha:dimensionality_reduction}
 
 \TODO{Read
-https://www.science.org/doi/full/10.1126/science.290.5500.2319?casa_token=whDQpzuoiBkAAAAA%3AYzbhWSgYlY6xTx399b0zDK7OLnSRkdrdKcp8024KOfx-nETbTfJXHeM80U06Phop5o5K7eSPI2Jm0g}
+https://www.science.org/doi/full/10.1126/science.290.5500.2319?casa\_token=whDQpzuoiBkAAAAA\%3AYzbhWSgYlY6xTx399b0zDK7OLnSRkdrdKcp8024KOfx-nETbTfJXHeM80U06Phop5o5K7eSPI2Jm0g}
 
 We now give an overview of dimensionality reduction (DR) in machine learning
 scenarios. Classical, linear methods are outlined in Sections
 \ref{sec:random_projections} and \ref{sec:principle_component_analysis}.
-\cite{dimensionality-reduction-a-comparative}
-highlights that linear methods often cannot handle complex, nonlinear data, and
-provides the taxonomy in \reffig{drtaxonomy} for help in discovery of proper DR
-methods. 
-
-\begin{figure}
-    \includegraphics[\width=\linewidth]{resources/drtaxonomy.png}
-    \label{fig:drtaxonomy}
-    \caption{Taxonomy of DR techniques}
-\end{figure}
+\cite{dimensionality-reduction-a-comparative} shows that nonlinear methods
+underperform traditional PCA on 1-nearest neighbor classification tasks for 
+artificial and natural datasets alike (often drastically). Even the best
+non-convex methods seem to only match the performance of PCA, while all
+nonlinear methods tend to have a much higher computational complexity than PCA.
 
 
 \section{Random Projections}%
@@ -35,7 +30,7 @@ methods.
 \end{definition}
 
 These methods work as follows:
-\paragraph{Random Projection Algorithm}
+\paragraph*{Random Projection Algorithm}
 \begin{enumerate}
     \item Start with a matrix $\mat A \in \R^{m \times n}$ and a low-dimensional
         embedding $\mat \Pi \in \R^{k \times n}$. 
@@ -205,6 +200,7 @@ for any $\alpha, \beta > 1$, if
 
 
 \section{Principle Component Analysis}
+\label{sec:principle_component_analysis}
 
 \section{Comparisons}
 
