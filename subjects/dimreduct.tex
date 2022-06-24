@@ -9,13 +9,14 @@
 https://www.science.org/doi/full/10.1126/science.290.5500.2319?casa\_token=whDQpzuoiBkAAAAA\%3AYzbhWSgYlY6xTx399b0zDK7OLnSRkdrdKcp8024KOfx-nETbTfJXHeM80U06Phop5o5K7eSPI2Jm0g}
 
 We now give an overview of dimensionality reduction (DR) in machine learning
-scenarios. Classical, linear methods are outlined in Sections
+scenarios. This overview looks at how DR has been employed in both input
+and parameter reduction techniques. We still seek to find more papers on
+DR in parameter reduction tasks, specifically in reducing the communication
+costs in parameter update methods such that the relative structure of the
+updates are preserved. Both techniques are being reviewed for intuition.
+
+Classical, linear methods are outlined in Sections
 \ref{sec:random_projections} and \ref{sec:principle_component_analysis}.
-\cite{dimensionality-reduction-a-comparative} shows that nonlinear methods
-underperform traditional PCA on 1-nearest neighbor classification tasks for 
-artificial and natural datasets alike (often drastically). Even the best
-non-convex methods seem to only match the performance of PCA, while all
-nonlinear methods tend to have a much higher computational complexity than PCA.
 
 
 \section{Random Projections}%
@@ -69,8 +70,8 @@ Let $\mat Y^\mppi$ denote the Moore-Penrose pseudo-inverse.
     In the previous definitions given from
     \cite{improved-matrix-algorithms-via-the-subsampled-randomized-hadamard-transform},
     the parameters $s$ and $k$ are used without given much definition. For my
-    own intuition, I believe $s$ to be the \emph{rank-reduction} while $k$ is
-    the \emph{dimensionality-reduction}. The parameters respectfully represent
+    own intuition, I believe $s$ to be the \emph{rank-reduction parameter} while $k$ is
+    the \emph{dimensionality-reduction parameter}. The parameters respectfully represent
     how low the rank should be in the final matrix and how low the
     dimensionality of the matrix should be. Furthermore, $\mat A_s$ minimizes
     $\norm{\mat A - \mat X}$ for any $\rank{\mat X} \leq s$ while $\tilde{\mat
@@ -85,6 +86,10 @@ Let $\mat Y^\mppi$ denote the Moore-Penrose pseudo-inverse.
 \subsection{Subsampled Randomized Projections}%
 \label{sub:subsample_projections}
 
+
+\TODO{Include Gaussian low-rank approximation from
+\cite{improved-matrix-algorithms-via-the-subsampled-randomized-hadamard-transform}
+since it seems promising.}
 
 
 We now define a list of random projections that have been observed in papers. We
@@ -133,7 +138,7 @@ constructed and $\mat \Pi \vec x$ can be computed in $\cal O(2n\lg(k +
 \cite{improved-matrix-algorithms-via-the-subsampled-randomized-hadamard-transform}
 results in the following theorem for SRHT:
 \begin{theorem}
-    Fix a rank-reduction $2 \leq s < r$. Let $0 < \epsilon < 1/3$ be an accuracy
+    Fix a rank-reduction parameter $2 \leq s < r$. Let $0 < \epsilon < 1/3$ be an accuracy
     parameter, $0 < \delta < 1$ be a failure probability, and $C \geq 1$ be any
     specified constant. Let $\mat \Pi \in \R^{k \times n}$ be an SRHT with $k$
     satisfying 
@@ -207,12 +212,16 @@ for any $\alpha, \beta > 1$, if
 \cite{experiments-with-random-projections-for-machine-learning} states that PCA
 often has a higher computational complexity, but tends to outperform RP. RP
 benefits from having a lower computational complexity as well as maintaining
-distance-preserving properties.
+distance-preserving properties. Both PCA and RP are tested across decision
+tress, nearest neighbor methods, and SVM on two-class classification problems
+using a projection built s.t. $r_{i, j} \sim \cal{R}$ where $\cal{R}$ is the
+Rademacher distribution. Their results show that both algorithms can nearly
+match the performance of the original algorithm for nearest neighbor problems,
+but RP underperforms PCA on almost all accounts for the other two problems.
 
-\cite{experiments-with-random-projections-for-machine-learning} tests both PCA
-and RP on decision tress, nearest neighbor methods, and SVM on two-class
-classification problems using a projection built s.t. $r_{i, j} \sim \cal{R}$
-where $\cal{R}$ is the Rademacher distribution. Their results show that both
-algorithms can nearly match the performance of the original algorithm for
-nearest neighbor problems, but RP underperforms PCA on almost all accounts for
-the other two problems.
+\cite{dimensionality-reduction-a-comparative} shows that nonlinear  methods
+(e.g.\ auto-encoders) underperform traditional PCA on 1-nearest neighbor
+classification tasks for artificial and natural datasets alike (often
+drastically). Even the best non-convex methods seem to only match the
+performance of PCA. All nonlinear methods tend to have a much higher
+computational complexity than PCA with limited exception.
